@@ -1,0 +1,89 @@
+<section class="fk-page">
+  <app-page-header
+    title="Discount rules"
+    subtitle="Customer discounts by scope. Separate from partner incentives; a customer can use a referral discount once per lifetime."
+    [count]="facade.page().totalItems"
+  >
+    <app-button actions (pressed)="openCreate()">New discount rule</app-button>
+  </app-page-header>
+
+  <app-filter-bar
+    class="toolbar"
+    searchPlaceholder="Search name or scope…"
+    [searchTerm]="facade.search()"
+    [activeCount]="facade.activeFilterCount()"
+    (searchChange)="onSearch($event)"
+    (clearAll)="onClearFilters()"
+  >
+    <app-select-field
+      [control]="scopeFilter"
+      label="Applies to"
+      placeholder="Any scope"
+      [options]="scopeOptions"
+    ></app-select-field>
+    <app-select-field
+      [control]="statusFilter"
+      label="Status"
+      placeholder="Any status"
+      [options]="statusOptions"
+    ></app-select-field>
+  </app-filter-bar>
+
+  @if (facade.listError() && !facade.loading()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load discount rules"
+      [message]="facade.listError()!.message"
+    >
+      <app-button variant="secondary" (pressed)="facade.reload()">Retry</app-button>
+    </app-empty-state>
+  } @else {
+    <app-data-table
+      [columns]="columns"
+      [rows]="facade.rows()"
+      [rowId]="rowId"
+      [sort]="facade.sort()"
+      [loading]="facade.loading()"
+      [pageSize]="facade.page().size"
+      caption="Discount rules"
+      emptyTitle="No discount rules match"
+      emptyMessage="Adjust your search or filters, or add a rule."
+      (sortChange)="onSort($event)"
+    >
+      <ng-template appColumnCell="discount" let-row>
+        <span class="disc fk-num">{{ discountSummary(row) }}</span>
+      </ng-template>
+      <ng-template appColumnCell="version" let-row>
+        <span class="fk-num">v{{ row.version }}</span>
+      </ng-template>
+      <ng-template appColumnCell="status" let-row>
+        <app-status-badge
+          [label]="statusLabel(row.status)"
+          [tone]="statusTone(row.status)"
+        ></app-status-badge>
+      </ng-template>
+      <ng-template appColumnCell="actions" let-row>
+        <div class="row-actions">
+          <app-button variant="ghost" size="sm" (pressed)="openEdit(row)">Edit</app-button>
+          <app-button
+            [variant]="row.status === 'ACTIVE' ? 'secondary' : 'primary'"
+            size="sm"
+            (pressed)="toggleStatus(row)"
+          >
+            {{ row.status === 'ACTIVE' ? 'Deactivate' : 'Reactivate' }}
+          </app-button>
+        </div>
+      </ng-template>
+    </app-data-table>
+
+    @if (facade.page().totalItems > 0) {
+      <app-pagination
+        [page]="facade.page().page"
+        [size]="facade.page().size"
+        [totalItems]="facade.page().totalItems"
+        [disabled]="facade.loading()"
+        (pageChange)="onPage($event)"
+      ></app-pagination>
+    }
+  }
+</section>

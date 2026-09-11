@@ -1,0 +1,83 @@
+<section class="fk-page">
+  @if (loading() && !partner()) {
+    <p class="muted">Loading partner…</p>
+  } @else if (loadError()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load this partner"
+      [message]="loadError()!.message"
+    >
+      <app-button variant="secondary" routerLink="/admin/partners">Back to partners</app-button>
+    </app-empty-state>
+  } @else if (partner(); as p) {
+    <app-page-header [title]="p.name" [subtitle]="p.partnerTypeName + ' · ' + p.partnerId">
+      <div actions class="head-actions">
+        <app-button variant="ghost" routerLink="/admin/partners">Back</app-button>
+        @if (!editing()) {
+          <app-button variant="secondary" (pressed)="startEdit()">Edit details</app-button>
+        }
+        <app-button variant="secondary" (pressed)="resetPassword()">Reset password</app-button>
+        <app-button
+          [variant]="p.status === 'ACTIVE' ? 'danger' : 'primary'"
+          (pressed)="toggleStatus()"
+        >
+          {{ p.status === 'ACTIVE' ? 'Deactivate' : 'Reactivate' }}
+        </app-button>
+      </div>
+    </app-page-header>
+
+    <div class="badges">
+      <app-status-badge
+        [label]="statusLabel[p.status]"
+        [tone]="p.status === 'ACTIVE' ? 'success' : 'neutral'"
+      ></app-status-badge>
+      <app-status-badge
+        [label]="passwordStateLabel[p.passwordState]"
+        [tone]="p.passwordState === 'MUST_CHANGE' ? 'warning' : 'info'"
+      ></app-status-badge>
+    </div>
+
+    @if (resetResult(); as rr) {
+      <app-alert tone="success" title="Temporary password generated">
+        @if (rr.delivery === 'ADMIN_DISPLAY' && rr.temporaryPassword) {
+          <p>
+            Share this one-time password with the partner securely. It is shown once and not stored:
+          </p>
+          <p class="temp-pass fk-num">{{ rr.temporaryPassword }}</p>
+        } @else {
+          <p>A temporary password has been sent to the partner via {{ rr.delivery | lowercase }}.</p>
+        }
+        <app-button size="sm" variant="secondary" (pressed)="dismissResetResult()">Done</app-button>
+      </app-alert>
+    }
+
+    @if (editing()) {
+      <app-partner-form
+        mode="edit"
+        [partner]="p"
+        [partnerTypeOptions]="typeOptions()"
+        [saving]="saving()"
+        [saveError]="saveError()"
+        (save)="onSave($event)"
+        (cancel)="cancelEdit()"
+      ></app-partner-form>
+    } @else {
+      <dl class="detail">
+        <div><dt>Partner ID</dt><dd class="fk-num">{{ p.partnerId }}</dd></div>
+        <div><dt>Referral / coupon code</dt><dd class="fk-num">{{ p.referralCode }}</dd></div>
+        <div><dt>Partner type</dt><dd>{{ p.partnerTypeName }}</dd></div>
+        <div><dt>Specialisation</dt><dd>{{ p.specialisation || '—' }}</dd></div>
+        <div><dt>Mobile</dt><dd>{{ p.mobile }}</dd></div>
+        <div><dt>Email</dt><dd>{{ p.email }}</dd></div>
+        <div class="detail__wide">
+          <dt>Professional address</dt>
+          <dd>{{ p.professionalAddress || '—' }}</dd>
+        </div>
+        <div><dt>Enrolled</dt><dd>{{ p.createdAt | date: 'mediumDate' }}</dd></div>
+        @if (p.deactivatedAt) {
+          <div><dt>Deactivated</dt><dd>{{ p.deactivatedAt | date: 'mediumDate' }}</dd></div>
+        }
+      </dl>
+    }
+  }
+</section>

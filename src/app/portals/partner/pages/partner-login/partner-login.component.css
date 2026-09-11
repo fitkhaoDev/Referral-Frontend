@@ -1,0 +1,10 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-5);
+}
+.hint {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+  line-height: 1.5;
+}

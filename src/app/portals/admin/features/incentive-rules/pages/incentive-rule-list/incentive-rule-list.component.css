@@ -1,0 +1,16 @@
+.toolbar {
+  margin-bottom: var(--fk-space-4);
+}
+.renewal {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-ink-2);
+}
+.row-actions {
+  display: inline-flex;
+  gap: var(--fk-space-2);
+  justify-content: flex-end;
+}
+app-pagination {
+  display: block;
+  margin-top: var(--fk-space-2);
+}

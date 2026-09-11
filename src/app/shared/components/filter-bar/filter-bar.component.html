@@ -1,0 +1,50 @@
+<div class="fbar">
+  <div class="fbar__search">
+    <span class="fbar__search-icon" aria-hidden="true">⌕</span>
+    <input
+      type="search"
+      [formControl]="searchControl"
+      [attr.placeholder]="searchPlaceholder()"
+      [attr.aria-label]="searchPlaceholder()"
+    />
+  </div>
+
+  @if (hasFilters()) {
+    <button
+      type="button"
+      class="fbar__filters-toggle"
+      [attr.aria-expanded]="sheetOpen()"
+      (click)="toggleSheet()"
+    >
+      Filters
+      @if (activeCount() > 0) {
+        <span class="fbar__badge fk-num" aria-label="{{ activeCount() }} active filters">{{
+          activeCount()
+        }}</span>
+      }
+    </button>
+  }
+
+  @if (activeCount() > 0) {
+    <button type="button" class="fbar__clear" (click)="onClearAll()">Clear all</button>
+  }
+
+  @if (hasFilters()) {
+    <div class="fbar__filters" [class.is-open]="sheetOpen()">
+      <div class="fbar__sheet-head">
+        <p>Filters</p>
+        <button type="button" aria-label="Close filters" (click)="closeSheet()">&times;</button>
+      </div>
+      <div class="fbar__controls">
+        <ng-content></ng-content>
+      </div>
+      <div class="fbar__sheet-foot">
+        <button type="button" class="fbar__apply" (click)="closeSheet()">Done</button>
+      </div>
+    </div>
+  }
+</div>
+
+@if (sheetOpen()) {
+  <button type="button" class="fbar__scrim" aria-label="Close filters" (click)="closeSheet()"></button>
+}

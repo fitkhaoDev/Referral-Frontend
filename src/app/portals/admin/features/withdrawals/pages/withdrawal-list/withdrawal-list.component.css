@@ -1,0 +1,28 @@
+app-alert {
+  display: block;
+  margin-bottom: var(--fk-space-4);
+}
+.toolbar {
+  margin-bottom: var(--fk-space-4);
+}
+.code {
+  font-family: var(--fk-font-num);
+  font-size: var(--fk-text-xs);
+  background: var(--fk-surface-sunken);
+  padding: 2px 6px;
+  border-radius: var(--fk-radius-sm);
+  color: var(--fk-ink-2);
+}
+.when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.when__time {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+}
+app-pagination {
+  display: block;
+  margin-top: var(--fk-space-2);
+}

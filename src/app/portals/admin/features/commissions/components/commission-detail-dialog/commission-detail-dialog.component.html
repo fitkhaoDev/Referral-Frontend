@@ -1,0 +1,92 @@
+<app-dialog-shell
+  [title]="commission.reference"
+  [subtitle]="commission.eventName + ' · ' + (commission.occurredAt | date: 'medium')"
+  (dismissed)="close()"
+>
+  <div class="cd">
+    <div class="cd__headline">
+      <span class="cd__amount fk-num">{{ commission.calculatedAmount | money }}</span>
+      <app-status-badge
+        [label]="statusLabelOf(commission.status)"
+        [tone]="statusTone(commission.status)"
+      ></app-status-badge>
+    </div>
+
+    <section aria-label="Attribution">
+      <h3>Attribution</h3>
+      <dl>
+        <div><dt>Beneficiary</dt><dd>{{ beneficiaryName() }}</dd></div>
+        <div><dt>Beneficiary type</dt><dd>{{ commission.beneficiaryType | titlecase }}</dd></div>
+        <div><dt>Customer</dt><dd class="fk-num">{{ commission.customerRef }}</dd></div>
+        <div><dt>Referral code</dt><dd class="fk-num">{{ commission.referralCode }}</dd></div>
+        @if (commission.organisationName) {
+          <div><dt>Organisation</dt><dd>{{ commission.organisationName }}</dd></div>
+        }
+        <div><dt>Event</dt><dd>{{ commission.eventName }}</dd></div>
+        @if (commission.transactionRef) {
+          <div><dt>Transaction</dt><dd class="fk-num">{{ commission.transactionRef }}</dd></div>
+        }
+      </dl>
+    </section>
+
+    <section class="cd__snapshot" aria-label="Rule snapshot">
+      <h3>Rule snapshot</h3>
+      <p class="cd__snapshot-note">
+        The incentive rule exactly as it stood when this commission was generated. A later rule
+        change never rewrites this — the figure above stays fixed.
+      </p>
+      <dl>
+        <div><dt>Rule</dt><dd class="fk-num">{{ commission.ruleSnapshot.ruleId }} · v{{ commission.ruleSnapshot.ruleVersion }}</dd></div>
+        <div><dt>Incentive type</dt><dd>{{ incentiveTypeLabelOf(commission.ruleSnapshot.incentiveType) }}</dd></div>
+        @if (commission.ruleSnapshot.renewalNumber) {
+          <div><dt>Renewal number</dt><dd class="fk-num">#{{ commission.ruleSnapshot.renewalNumber }}</dd></div>
+        }
+        <div>
+          <dt>Rate</dt>
+          <dd class="fk-num">
+            @if (commission.ruleSnapshot.componentKind === 'PERCENT') {
+              {{ commission.ruleSnapshot.percent }}%
+            } @else {
+              {{ commission.ruleSnapshot.fixedAmount | money }}
+            }
+          </dd>
+        </div>
+        @if (commission.ruleSnapshot.eligibleAmount) {
+          <div>
+            <dt>Eligible amount (base)</dt>
+            <dd class="fk-num">{{ commission.ruleSnapshot.eligibleAmount | money }}</dd>
+          </div>
+        }
+        <div>
+          <dt>Calculated commission</dt>
+          <dd class="fk-num">{{ commission.calculatedAmount | money }}</dd>
+        </div>
+        <div><dt>Snapshotted</dt><dd>{{ commission.ruleSnapshot.snapshotAt | date: 'medium' }}</dd></div>
+      </dl>
+    </section>
+
+    <section aria-label="Lifecycle">
+      <h3>Lifecycle</h3>
+      <dl>
+        <div><dt>Event occurred</dt><dd>{{ commission.occurredAt | date: 'medium' }}</dd></div>
+        @if (commission.availableAt) {
+          <div><dt>Became available</dt><dd>{{ commission.availableAt | date: 'medium' }}</dd></div>
+        }
+        @if (commission.reversedAt) {
+          <div><dt>Reversed</dt><dd>{{ commission.reversedAt | date: 'medium' }}</dd></div>
+          <div class="cd__wide"><dt>Reversal reason</dt><dd>{{ commission.reversalReason }}</dd></div>
+        }
+      </dl>
+      @if (commission.status === 'REVERSED') {
+        <app-alert tone="warning" title="Reversed">
+          The original commission row is kept for audit. A separate reversal transaction appears in
+          the beneficiary's wallet ledger, recovered against future incentives.
+        </app-alert>
+      }
+    </section>
+  </div>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="close()">Close</app-button>
+  </div>
+</app-dialog-shell>

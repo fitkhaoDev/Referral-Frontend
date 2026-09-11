@@ -1,0 +1,39 @@
+.toolbar {
+  margin-bottom: var(--fk-space-4);
+}
+.code {
+  font-family: var(--fk-font-num);
+  font-size: var(--fk-text-xs);
+  background: var(--fk-surface-sunken);
+  padding: 2px 6px;
+  border-radius: var(--fk-radius-sm);
+  color: var(--fk-ink-2);
+}
+.src {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.src__tag {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+}
+.comm {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fk-space-2);
+  justify-content: flex-end;
+}
+.when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.when__time {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+}
+app-pagination {
+  display: block;
+  margin-top: var(--fk-space-2);
+}

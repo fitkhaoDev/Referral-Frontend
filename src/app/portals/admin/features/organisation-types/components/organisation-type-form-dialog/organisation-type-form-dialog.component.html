@@ -1,0 +1,54 @@
+<app-dialog-shell
+  [title]="isEdit ? 'Edit organisation type' : 'New organisation type'"
+  [subtitle]="editing ? editing.code : 'Organisational partner classification'"
+  (dismissed)="cancel()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+    @if (genericError(); as msg) {
+      <app-alert tone="error" title="Could not save">{{ msg }}</app-alert>
+    }
+
+    <app-text-field
+      [control]="form.controls.name"
+      label="Name"
+      placeholder="e.g. Diagnostic Centre"
+      requiredMark
+    ></app-text-field>
+
+    <app-text-field
+      [control]="form.controls.code"
+      label="Code"
+      placeholder="e.g. DIAGNOSTIC_CENTRE"
+      [hint]="
+        isEdit
+          ? 'The code cannot be changed after creation.'
+          : 'UPPER_SNAKE_CASE. Discount and incentive rules reference this — it is permanent.'
+      "
+      [errors]="{ pattern: 'Use uppercase letters, numbers and underscores, starting with a letter.' }"
+      requiredMark
+    ></app-text-field>
+
+    <label class="field">
+      <span class="field__label">Description</span>
+      <textarea
+        rows="3"
+        formControlName="description"
+        placeholder="Optional — what this organisation type covers"
+      ></textarea>
+    </label>
+
+    <app-switch-field
+      [control]="form.controls.active"
+      label="Status"
+      onText="Active"
+      offText="Inactive"
+    ></app-switch-field>
+  </form>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    <app-button [loading]="saving()" (pressed)="submit()">
+      {{ isEdit ? 'Save changes' : 'Create organisation type' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

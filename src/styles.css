@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global stylesheet entry point. Keep this file thin — see src/styles/*. */
+@import './styles/tokens.css';
+@import './styles/base.css';
+
+/* CDK overlay positioning for dialogs, menus and bottom sheets. */
+@import '@angular/cdk/overlay-prebuilt.css';

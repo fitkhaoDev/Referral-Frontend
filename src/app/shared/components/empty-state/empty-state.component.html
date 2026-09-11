@@ -1,0 +1,7 @@
+<div class="empty" [class.empty--error]="tone() === 'error'">
+  <p class="empty__title">{{ title() }}</p>
+  @if (message()) {
+    <p class="empty__message">{{ message() }}</p>
+  }
+  <div class="empty__actions"><ng-content></ng-content></div>
+</div>

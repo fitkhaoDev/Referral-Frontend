@@ -1,0 +1,167 @@
+<section class="fk-page">
+  <app-page-header
+    title="Analytics"
+    subtitle="Referral, commission and payout trends. All figures are computed and bucketed by the backend."
+  ></app-page-header>
+
+  <div class="toolbar">
+    <app-select-field
+      [control]="form.controls.granularity"
+      label="Granularity"
+      [options]="granularityOptions"
+    ></app-select-field>
+    <app-date-field [control]="form.controls.fromDate" label="From"></app-date-field>
+    <app-date-field [control]="form.controls.toDate" label="To"></app-date-field>
+  </div>
+
+  @if (vm().error) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load analytics"
+      [message]="vm().error!.message"
+    >
+      <app-button variant="secondary" (pressed)="retry()">Retry</app-button>
+    </app-empty-state>
+  } @else if (vm().data; as d) {
+    <div class="kpis">
+      <div class="kpi">
+        <span class="kpi__k">Referrals</span>
+        <span class="kpi__v fk-num">{{ d.totals.referrals | number }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__k">Commissions earned</span>
+        <span class="kpi__v fk-num">{{ d.totals.commissionsEarned | money }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__k">Commissions paid</span>
+        <span class="kpi__v fk-num">{{ d.totals.commissionsPaid | money }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__k">Commissions reversed</span>
+        <span class="kpi__v fk-num danger">{{ d.totals.commissionsReversed | money }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__k">Withdrawals paid</span>
+        <span class="kpi__v fk-num">{{ d.totals.withdrawalsPaid | money }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__k">Active partners</span>
+        <span class="kpi__v fk-num">{{ d.totals.activePartners | number }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__k">Active organisations</span>
+        <span class="kpi__v fk-num">{{ d.totals.activeOrganisations | number }}</span>
+      </div>
+    </div>
+
+    <div class="charts">
+      <figure class="panel panel--wide">
+        <figcaption>Referrals over time</figcaption>
+        <div class="chart">
+          <ngx-charts-line-chart
+            [results]="referralsChart(d)"
+            [scheme]="scheme"
+            [xAxis]="true"
+            [yAxis]="true"
+            [roundDomains]="true"
+            [autoScale]="true"
+          ></ngx-charts-line-chart>
+        </div>
+      </figure>
+
+      <figure class="panel panel--wide">
+        <figcaption>Commissions — earned, paid &amp; reversed (₹)</figcaption>
+        <div class="chart">
+          <ngx-charts-line-chart
+            [results]="commissionsChart(d)"
+            [scheme]="scheme"
+            [xAxis]="true"
+            [yAxis]="true"
+            [legend]="true"
+            [legendPosition]="LegendPosition.Below"
+            [roundDomains]="true"
+            [autoScale]="true"
+            [yAxisTickFormatting]="currencyAxis"
+          ></ngx-charts-line-chart>
+        </div>
+      </figure>
+
+      <figure class="panel panel--wide">
+        <figcaption>Withdrawals paid (₹)</figcaption>
+        <div class="chart">
+          <ngx-charts-line-chart
+            [results]="withdrawalsChart(d)"
+            [scheme]="scheme"
+            [xAxis]="true"
+            [yAxis]="true"
+            [roundDomains]="true"
+            [autoScale]="true"
+            [yAxisTickFormatting]="currencyAxis"
+          ></ngx-charts-line-chart>
+        </div>
+      </figure>
+
+      <figure class="panel">
+        <figcaption>Referrals by event</figcaption>
+        <div class="chart">
+          <ngx-charts-pie-chart
+            [results]="pie(d.eventBreakdown)"
+            [scheme]="scheme"
+            [labels]="true"
+            [doughnut]="true"
+            [legend]="true"
+            [legendPosition]="LegendPosition.Below"
+          ></ngx-charts-pie-chart>
+        </div>
+      </figure>
+
+      <figure class="panel">
+        <figcaption>Commissions by beneficiary</figcaption>
+        <div class="chart">
+          <ngx-charts-pie-chart
+            [results]="pie(d.beneficiarySplit)"
+            [scheme]="scheme"
+            [labels]="true"
+            [doughnut]="true"
+            [legend]="true"
+            [legendPosition]="LegendPosition.Below"
+          ></ngx-charts-pie-chart>
+        </div>
+      </figure>
+    </div>
+
+    <div class="ranks">
+      <section class="panel">
+        <h2>Top individual partners</h2>
+        <ol class="rank">
+          @for (r of d.topPartners; track r.id) {
+            <li>
+              <span class="rank__name">{{ r.name }}</span>
+              <span class="rank__meta">{{ r.referrals | number }} referrals</span>
+              <span class="rank__amt fk-num">{{ r.earned | money }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+      <section class="panel">
+        <h2>Top organisations</h2>
+        <ol class="rank">
+          @for (r of d.topOrganisations; track r.id) {
+            <li>
+              <span class="rank__name">{{ r.name }}</span>
+              <span class="rank__meta">{{ r.referrals | number }} referrals</span>
+              <span class="rank__amt fk-num">{{ r.earned | money }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
+  } @else {
+    <div class="kpis" aria-hidden="true">
+      @for (s of [1, 2, 3, 4, 5, 6, 7]; track s) {
+        <div class="kpi kpi--skeleton"><span></span><span></span></div>
+      }
+    </div>
+    <p class="muted">Loading analytics…</p>
+  }
+</section>

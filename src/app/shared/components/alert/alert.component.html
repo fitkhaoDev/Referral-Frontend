@@ -1,0 +1,9 @@
+<div class="alert" [class]="'alert--' + tone()" [attr.role]="tone() === 'error' ? 'alert' : 'status'">
+  <span class="alert__icon" aria-hidden="true">{{ glyph() }}</span>
+  <div class="alert__content">
+    @if (title()) {
+      <p class="alert__title">{{ title() }}</p>
+    }
+    <ng-content></ng-content>
+  </div>
+</div>

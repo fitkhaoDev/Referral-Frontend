@@ -1,0 +1,64 @@
+<div class="shell">
+  @if (loading.active()) {
+    <div class="shell__progress" role="progressbar" aria-label="Loading"></div>
+  }
+
+  <a class="fk-visually-hidden" href="#partner-main">Skip to main content</a>
+
+  <header class="topbar">
+    <a routerLink="/partner/dashboard" class="topbar__brand" aria-label="FitKhao home">
+      <app-logo [size]="30" [showWordmark]="false"></app-logo>
+      <span class="topbar__name">FitKhao Partners</span>
+    </a>
+
+    <div class="topbar__spacer"></div>
+
+    <div class="usermenu">
+      <button
+        type="button"
+        class="usermenu__trigger"
+        [attr.aria-expanded]="menuOpen()"
+        (click)="toggleMenu()"
+      >
+        <span class="usermenu__avatar" aria-hidden="true">{{ (user()?.displayName || 'P')[0] }}</span>
+        <span class="usermenu__meta">
+          <span class="usermenu__name">{{ user()?.displayName }}</span>
+          <span class="usermenu__id">{{ user()?.partnerId }}</span>
+        </span>
+      </button>
+      @if (menuOpen()) {
+        <div class="usermenu__panel" role="menu">
+          <a routerLink="/partner/profile" role="menuitem" (click)="menuOpen.set(false)">Profile</a>
+          <a routerLink="/partner/change-password" role="menuitem" (click)="menuOpen.set(false)">
+            Change password
+          </a>
+          <button type="button" role="menuitem" (click)="signOut()">Sign out</button>
+        </div>
+      }
+    </div>
+  </header>
+
+  <nav class="railnav" aria-label="Partner sections">
+    @for (item of nav; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="is-active">
+        <span class="railnav__glyph" aria-hidden="true">{{ item.glyph }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <main id="partner-main" class="content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="tabbar" aria-label="Partner sections">
+    @for (item of nav; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="is-active">
+        <span class="tabbar__glyph" aria-hidden="true">{{ item.glyph }}</span>
+        <span class="tabbar__label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <app-notification-host></app-notification-host>
+</div>

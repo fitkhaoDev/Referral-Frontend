@@ -1,0 +1,146 @@
+import { Dialog } from '@angular/cdk/dialog';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { LOCALE_ID } from '@angular/core';
+import { SortSpec } from '@core/models/api.model';
+import { ENTITY_STATUS_LABEL } from '@core/models/common.model';
+import { toMajorUnits } from '@core/models/money.model';
+import { RULE_SCOPE_TYPE_LABEL, RuleScopeType } from '@core/models/rule-scope.model';
+import { TableColumn } from '@shared/components/data-table/table-column.model';
+import { SelectOption } from '@shared/components/form-fields/select-field/select-field.component';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { connectListToUrl } from '@shared/store/connect-list-to-url';
+import { DiscountRuleFormDialogComponent } from '../../components/discount-rule-form-dialog/discount-rule-form-dialog.component';
+import { DiscountRule } from '../../models/discount-rule.model';
+import { DiscountRulesFacade } from '../../store/discount-rules.facade';
+import { DISCOUNT_RULE_FILTER_KEYS, discountRulesList } from '../../store/discount-rules.list';
+
+@Component({
+  selector: 'app-discount-rule-list',
+  standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './discount-rule-list.component.html',
+  styleUrl: './discount-rule-list.component.css',
+})
+export class DiscountRuleListComponent {
+  protected readonly facade = inject(DiscountRulesFacade);
+  private readonly dialog = inject(Dialog);
+  private readonly confirm = inject(ConfirmService);
+  private readonly locale = inject(LOCALE_ID);
+
+  protected readonly scopeFilter = new FormControl<string>('', { nonNullable: true });
+  protected readonly statusFilter = new FormControl<string>('', { nonNullable: true });
+
+  protected readonly scopeOptions: SelectOption[] = (
+    ['GLOBAL', 'PARTNER_TYPE', 'ORGANISATION_TYPE', 'ORGANISATION'] as RuleScopeType[]
+  ).map((v) => ({ value: v, label: RULE_SCOPE_TYPE_LABEL[v] }));
+  protected readonly statusOptions: SelectOption[] = [
+    { value: 'ACTIVE', label: 'Active' },
+    { value: 'INACTIVE', label: 'Inactive' },
+  ];
+
+  protected readonly columns: TableColumn<DiscountRule>[] = [
+    { key: 'name', header: 'Name', sortable: true, primary: true, value: (r) => r.name },
+    { key: 'scopeLabel', header: 'Applies to', primary: true, value: (r) => r.scopeLabel },
+    { key: 'discount', header: 'Discount' },
+    { key: 'effectiveFrom', header: 'Effective from', sortable: true, value: (r) => r.effectiveFrom },
+    { key: 'version', header: 'Version', align: 'end', value: (r) => 'v' + r.version },
+    { key: 'status', header: 'Status', sortable: true },
+    { key: 'actions', header: 'Actions', align: 'end' },
+  ];
+
+  protected readonly rowId = (row: DiscountRule): string => row.id;
+
+  constructor() {
+    connectListToUrl(discountRulesList, { filterKeys: DISCOUNT_RULE_FILTER_KEYS });
+
+    effect(() => {
+      const f = this.facade.filters();
+      this.sync(this.scopeFilter, f.scopeType ?? '');
+      this.sync(this.statusFilter, f.status ?? '');
+    });
+
+    this.scopeFilter.valueChanges.subscribe(() => this.push());
+    this.statusFilter.valueChanges.subscribe(() => this.push());
+  }
+
+  private sync(control: FormControl<string>, value: string): void {
+    if (control.value !== value) control.setValue(value, { emitEvent: false });
+  }
+  private push(): void {
+    this.facade.setFilters({
+      scopeType: (this.scopeFilter.value || undefined) as RuleScopeType | undefined,
+      status: (this.statusFilter.value || undefined) as DiscountRule['status'] | undefined,
+    });
+  }
+
+  protected discountSummary(rule: DiscountRule): string {
+    const d = rule.discount;
+    if (d.kind === 'NONE') return 'No discount';
+    if (d.kind === 'FIXED') {
+      return d.amount
+        ? new Intl.NumberFormat(this.locale, {
+            style: 'currency',
+            currency: d.amount.currency,
+            maximumFractionDigits: 0,
+          }).format(toMajorUnits(d.amount))
+        : '—';
+    }
+    const cap = d.maxAmount
+      ? ` (max ${new Intl.NumberFormat(this.locale, {
+          style: 'currency',
+          currency: d.maxAmount.currency,
+          maximumFractionDigits: 0,
+        }).format(toMajorUnits(d.maxAmount))})`
+      : '';
+    return `${d.percent}%${cap}`;
+  }
+
+  protected statusTone(status: DiscountRule['status']): 'success' | 'neutral' {
+    return status === 'ACTIVE' ? 'success' : 'neutral';
+  }
+  protected statusLabel(status: DiscountRule['status']): string {
+    return ENTITY_STATUS_LABEL[status];
+  }
+
+  protected onSort(sort: SortSpec[]): void {
+    this.facade.setSort(sort);
+  }
+  protected onPage(event: { page: number; size: number }): void {
+    this.facade.setPage(event.page, event.size);
+  }
+  protected onSearch(search: string): void {
+    this.facade.setSearch(search);
+  }
+  protected onClearFilters(): void {
+    this.facade.clearFilters();
+  }
+
+  protected openCreate(): void {
+    this.dialog.open(DiscountRuleFormDialogComponent, {
+      data: { mode: 'create' },
+      panelClass: 'fk-dialog-panel',
+      autoFocus: 'dialog',
+    });
+  }
+  protected openEdit(row: DiscountRule): void {
+    this.dialog.open(DiscountRuleFormDialogComponent, {
+      data: { mode: 'edit', rule: row },
+      panelClass: 'fk-dialog-panel',
+      autoFocus: 'dialog',
+    });
+  }
+
+  protected async toggleStatus(row: DiscountRule): Promise<void> {
+    const deactivating = row.status === 'ACTIVE';
+    const ok = await this.confirm.confirm({
+      title: deactivating ? `Deactivate “${row.name}”?` : `Reactivate “${row.name}”?`,
+      message: deactivating
+        ? 'New customers in this scope will get no referral discount from this rule. Discounts already applied are unaffected.'
+        : 'This rule will grant its discount to new customers in scope again.',
+      confirmLabel: deactivating ? 'Deactivate' : 'Reactivate',
+      tone: deactivating ? 'danger' : 'primary',
+    });
+    if (ok) this.facade.setStatus(row.id, deactivating ? 'INACTIVE' : 'ACTIVE');
+  }
+}

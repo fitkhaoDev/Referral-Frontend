@@ -1,0 +1,81 @@
+<section class="fk-page">
+  <app-page-header
+    title="Wallets"
+    subtitle="Every partner, organisation and doctor wallet. Balances are maintained by the backend — this is a read-only view."
+    [count]="facade.page().totalItems"
+  ></app-page-header>
+
+  <app-filter-bar
+    class="toolbar"
+    searchPlaceholder="Search owner name or reference…"
+    [searchTerm]="facade.search()"
+    [activeCount]="facade.activeFilterCount()"
+    (searchChange)="onSearch($event)"
+    (clearAll)="onClearFilters()"
+  >
+    <app-select-field
+      [control]="ownerTypeFilter"
+      label="Owner type"
+      placeholder="Any type"
+      [options]="ownerTypeOptions"
+    ></app-select-field>
+  </app-filter-bar>
+
+  @if (facade.listError() && !facade.loading()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load wallets"
+      [message]="facade.listError()!.message"
+    >
+      <app-button variant="secondary" (pressed)="facade.reload()">Retry</app-button>
+    </app-empty-state>
+  } @else {
+    <app-data-table
+      [columns]="columns"
+      [rows]="facade.rows()"
+      [rowId]="rowId"
+      [sort]="facade.sort()"
+      [loading]="facade.loading()"
+      [pageSize]="facade.page().size"
+      clickableRows
+      caption="Wallets"
+      emptyTitle="No wallets match"
+      emptyMessage="Adjust your search or owner-type filter."
+      (sortChange)="onSort($event)"
+      (rowActivate)="view($event)"
+    >
+      <ng-template appColumnCell="ownerRef" let-row>
+        <code class="code">{{ row.ownerRef }}</code>
+      </ng-template>
+      <ng-template appColumnCell="available" let-row>
+        <span class="fk-num">{{ row.available | money }}</span>
+      </ng-template>
+      <ng-template appColumnCell="pending" let-row>
+        <span class="fk-num muted">{{ row.pending | money }}</span>
+      </ng-template>
+      <ng-template appColumnCell="outstandingRecovery" let-row>
+        @if (row.outstandingRecovery.minorUnits > 0) {
+          <span class="fk-num recovery">{{ row.outstandingRecovery | money }}</span>
+        } @else {
+          <span class="muted">—</span>
+        }
+      </ng-template>
+      <ng-template appColumnCell="lastActivityAt" let-row>
+        <span class="when">
+          <span>{{ row.lastActivityAt | date: 'mediumDate' }}</span>
+          <span class="when__time">{{ row.lastActivityAt | date: 'shortTime' }}</span>
+        </span>
+      </ng-template>
+    </app-data-table>
+
+    @if (facade.page().totalItems > 0) {
+      <app-pagination
+        [page]="facade.page().page"
+        [size]="facade.page().size"
+        [totalItems]="facade.page().totalItems"
+        [disabled]="facade.loading()"
+        (pageChange)="onPage($event)"
+      ></app-pagination>
+    }
+  }
+</section>

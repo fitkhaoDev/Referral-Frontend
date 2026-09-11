@@ -1,0 +1,131 @@
+<section class="fk-page">
+  @if (facade.summaryLoading() && !facade.summary()) {
+    <p class="muted">Loading wallet…</p>
+  } @else if (facade.summaryLoadError()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load this wallet"
+      [message]="facade.summaryLoadError()!.message"
+    >
+      <app-button variant="secondary" routerLink="/admin/wallet">Back to wallets</app-button>
+    </app-empty-state>
+  } @else if (facade.summary(); as w) {
+    <app-page-header
+      [title]="w.ownerName"
+      [subtitle]="ownerTypeLabel[w.ownerType] + ' · ' + w.ownerRef"
+    >
+      <div actions>
+        <app-button variant="ghost" routerLink="/admin/wallet">Back</app-button>
+      </div>
+    </app-page-header>
+
+    <p class="ledger-note">
+      All balances below are maintained and calculated by the platform backend. This screen never
+      re-derives a figure from the ledger — a reversal appears as its own debit row and the original
+      credit is left untouched for audit.
+    </p>
+
+    <div class="cards">
+      @for (card of cards; track card.key) {
+        <div class="card" [class.card--emphasis]="card.emphasis">
+          <span class="card__label">{{ card.label }}</span>
+          <span class="card__value fk-num">{{ card.value() | money }}</span>
+          <span class="card__hint">{{ card.hint }}</span>
+        </div>
+      }
+    </div>
+
+    <h2 class="ledger-heading">Ledger</h2>
+
+    <app-filter-bar
+      class="toolbar"
+      searchPlaceholder="Search reference, customer or commission…"
+      [searchTerm]="facade.ledgerSearch()"
+      [activeCount]="facade.ledgerActiveFilterCount()"
+      (searchChange)="onLedgerSearch($event)"
+      (clearAll)="onClearLedgerFilters()"
+    >
+      <app-select-field
+        [control]="typeFilter"
+        label="Type"
+        placeholder="Any type"
+        [options]="typeOptions"
+      ></app-select-field>
+      <app-select-field
+        [control]="statusFilter"
+        label="Status"
+        placeholder="Any status"
+        [options]="statusOptions"
+      ></app-select-field>
+      <app-date-field [control]="fromDate" label="From"></app-date-field>
+      <app-date-field [control]="toDate" label="To"></app-date-field>
+    </app-filter-bar>
+
+    @if (facade.ledgerError() && !facade.ledgerLoading()) {
+      <app-empty-state
+        tone="error"
+        title="Couldn’t load the ledger"
+        [message]="facade.ledgerError()!.message"
+      >
+        <app-button variant="secondary" (pressed)="facade.openLedger(id())">Retry</app-button>
+      </app-empty-state>
+    } @else {
+      <app-data-table
+        [columns]="columns"
+        [rows]="facade.ledgerRows()"
+        [rowId]="rowId"
+        [sort]="facade.ledgerSort()"
+        [loading]="facade.ledgerLoading()"
+        [pageSize]="facade.ledgerPage().size"
+        clickableRows
+        caption="Wallet ledger"
+        emptyTitle="No transactions match"
+        emptyMessage="Adjust the search, date range or filters."
+        (sortChange)="onLedgerSort($event)"
+        (rowActivate)="openTransaction($event)"
+      >
+        <ng-template appColumnCell="reference" let-row>
+          <code class="code">{{ row.reference }}</code>
+        </ng-template>
+        <ng-template appColumnCell="customerRef" let-row>
+          @if (row.customerRef) {
+            <code class="code">{{ row.customerRef }}</code>
+          } @else {
+            <span class="muted">—</span>
+          }
+        </ng-template>
+        <ng-template appColumnCell="amount" let-row>
+          <span
+            class="fk-num amount"
+            [class.amount--credit]="row.direction === 'CREDIT'"
+            [class.amount--debit]="row.direction === 'DEBIT'"
+          >
+            {{ row.direction === 'DEBIT' ? '−' : '+' }}{{ row.amount | money }}
+          </span>
+        </ng-template>
+        <ng-template appColumnCell="status" let-row>
+          <app-status-badge
+            [label]="statusLabelOf(row)"
+            [tone]="statusTone(row.status)"
+          ></app-status-badge>
+        </ng-template>
+        <ng-template appColumnCell="occurredAt" let-row>
+          <span class="when">
+            <span>{{ row.occurredAt | date: 'mediumDate' }}</span>
+            <span class="when__time">{{ row.occurredAt | date: 'shortTime' }}</span>
+          </span>
+        </ng-template>
+      </app-data-table>
+
+      @if (facade.ledgerPage().totalItems > 0) {
+        <app-pagination
+          [page]="facade.ledgerPage().page"
+          [size]="facade.ledgerPage().size"
+          [totalItems]="facade.ledgerPage().totalItems"
+          [disabled]="facade.ledgerLoading()"
+          (pageChange)="onLedgerPage($event)"
+        ></app-pagination>
+      }
+    }
+  }
+</section>

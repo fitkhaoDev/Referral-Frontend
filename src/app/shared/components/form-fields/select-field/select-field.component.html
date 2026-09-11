@@ -1,0 +1,30 @@
+<div class="field" [class.field--invalid]="showError()">
+  <label [for]="id" class="field__label">
+    {{ label() }}
+    @if (requiredMark()) {
+      <span class="field__req" aria-hidden="true">*</span>
+    }
+  </label>
+
+  <select
+    [id]="id"
+    class="field__select"
+    [formControl]="control()"
+    [attr.aria-invalid]="showError() || null"
+    [attr.aria-describedby]="describedBy()"
+  >
+    @if (placeholder()) {
+      <option value="" [disabled]="requiredMark()">{{ placeholder() }}</option>
+    }
+    @for (opt of options(); track opt.value) {
+      <option [value]="opt.value" [disabled]="opt.disabled ?? false">{{ opt.label }}</option>
+    }
+  </select>
+
+  @if (hint() && !showError()) {
+    <p class="field__hint" [id]="id + '-hint'">{{ hint() }}</p>
+  }
+  @if (showError()) {
+    <p class="field__error" [id]="id + '-error'" role="alert">{{ errorText() }}</p>
+  }
+</div>

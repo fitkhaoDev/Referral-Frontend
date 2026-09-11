@@ -1,0 +1,18 @@
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--fk-space-3);
+  margin-bottom: var(--fk-space-3);
+}
+.tag {
+  font-size: var(--fk-text-xs);
+  font-weight: var(--fk-weight-semibold);
+  color: var(--fk-warning);
+  background: var(--fk-warning-tint);
+  padding: 2px 8px;
+  border-radius: var(--fk-radius-pill);
+}
+.note {
+  color: var(--fk-muted);
+  max-width: 52ch;
+}

@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+.sw__label {
+  display: flex;
+  align-items: center;
+  gap: var(--fk-space-3);
+  cursor: pointer;
+}
+.sw__label input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.sw__track {
+  flex: none;
+  width: 42px;
+  height: 24px;
+  border-radius: var(--fk-radius-pill);
+  background: var(--fk-border-strong);
+  padding: 3px;
+  transition: background var(--fk-transition-fast);
+}
+.sw__thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--fk-shadow-xs);
+  transition: transform var(--fk-transition-fast);
+}
+.sw__label input:checked + .sw__track {
+  background: var(--fk-green);
+}
+.sw__label input:checked + .sw__track .sw__thumb {
+  transform: translateX(18px);
+}
+.sw__label input:focus-visible + .sw__track {
+  box-shadow: var(--fk-focus-ring);
+}
+.sw__text {
+  font-size: var(--fk-text-sm);
+  font-weight: var(--fk-weight-medium);
+}
+.sw__state {
+  color: var(--fk-muted);
+  font-weight: var(--fk-weight-regular);
+  margin-left: var(--fk-space-2);
+}
+.sw__hint {
+  margin-top: var(--fk-space-1);
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+}

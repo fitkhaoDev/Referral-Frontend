@@ -1,0 +1,21 @@
+:host {
+  display: inline-block;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fk-space-3);
+}
+.logo__img {
+  display: block;
+  border-radius: 22%;
+  object-fit: cover;
+  flex: none;
+}
+.logo__word {
+  font-size: 1.1em;
+  font-weight: var(--fk-weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--fk-ink);
+  white-space: nowrap;
+}

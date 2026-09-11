@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+.icf {
+  display: grid;
+  gap: var(--fk-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: start;
+}
+.icf--compact {
+  gap: var(--fk-space-3);
+}

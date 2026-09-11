@@ -1,0 +1,24 @@
+<section class="fk-page">
+  <header class="head">
+    <p class="hi">Hello,</p>
+    <h1>{{ user()?.displayName }}</h1>
+    <p class="code">
+      Referral code <strong>{{ user()?.referralCode }}</strong>
+    </p>
+  </header>
+
+  <div class="metrics" aria-hidden="true">
+    @for (m of skeletons; track $index) {
+      <div class="metric">
+        <span class="metric__k"></span>
+        <span class="metric__v"></span>
+      </div>
+    }
+  </div>
+
+  <p class="note">
+    Your live totals — referrals, counselling, purchases, renewals, earnings, available and pending
+    balance — plus monthly / quarterly / yearly charts are being connected to the analytics contract
+    next.
+  </p>
+</section>

@@ -1,0 +1,54 @@
+<app-dialog-shell
+  [title]="isEdit ? 'Edit partner type' : 'New partner type'"
+  [subtitle]="editing ? editing.code : 'Individual partner classification'"
+  (dismissed)="cancel()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form" id="partner-type-form">
+    @if (genericError(); as msg) {
+      <app-alert tone="error" title="Could not save">{{ msg }}</app-alert>
+    }
+
+    <app-text-field
+      [control]="form.controls.name"
+      label="Name"
+      placeholder="e.g. Physiotherapist"
+      requiredMark
+    ></app-text-field>
+
+    <app-text-field
+      [control]="form.controls.code"
+      label="Code"
+      placeholder="e.g. PHYSIOTHERAPIST"
+      [hint]="
+        isEdit
+          ? 'The code cannot be changed after creation.'
+          : 'UPPER_SNAKE_CASE. Used by incentive rules — choose carefully, it is permanent.'
+      "
+      [errors]="{ pattern: 'Use uppercase letters, numbers and underscores, starting with a letter.' }"
+      requiredMark
+    ></app-text-field>
+
+    <label class="field">
+      <span class="field__label">Description</span>
+      <textarea
+        rows="3"
+        formControlName="description"
+        placeholder="Optional — what this partner type covers"
+      ></textarea>
+    </label>
+
+    <app-switch-field
+      [control]="form.controls.active"
+      label="Status"
+      onText="Active"
+      offText="Inactive"
+    ></app-switch-field>
+  </form>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    <app-button [loading]="saving()" (pressed)="submit()">
+      {{ isEdit ? 'Save changes' : 'Create partner type' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

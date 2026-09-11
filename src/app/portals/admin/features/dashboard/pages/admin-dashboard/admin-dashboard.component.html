@@ -1,0 +1,123 @@
+<section class="fk-page">
+  <header class="head">
+    <h1>Welcome, {{ user()?.displayName }}</h1>
+    <p class="sub">Referral partner operations at a glance. Every figure links through to its screen.</p>
+  </header>
+
+  @if (counts(); as c) {
+    <div class="cards">
+      <a class="card" routerLink="/admin/partners">
+        <span class="card__label">Partners</span>
+        <span class="card__value fk-num">{{ c.partnersTotal ?? '—' }}</span>
+        <span class="card__sub">{{ c.partnersActive ?? '—' }} active</span>
+      </a>
+      <a class="card" routerLink="/admin/organisations">
+        <span class="card__label">Organisations</span>
+        <span class="card__value fk-num">{{ c.organisationsTotal ?? '—' }}</span>
+        <span class="card__sub">
+          {{ c.organisationsActive ?? '—' }} active · {{ c.organisationMembers ?? '—' }} members
+        </span>
+      </a>
+      <a class="card" routerLink="/admin/referrals">
+        <span class="card__label">Referrals</span>
+        <span class="card__value fk-num">{{ c.referralsTotal ?? '—' }}</span>
+        <span class="card__sub">all time</span>
+      </a>
+      <a class="card" routerLink="/admin/wallet">
+        <span class="card__label">Wallets</span>
+        <span class="card__value fk-num">{{ c.walletsTotal ?? '—' }}</span>
+        <span class="card__sub">partner · organisation · doctor</span>
+      </a>
+      <a
+        class="card"
+        [class.card--attention]="(c.withdrawalsRequested ?? 0) > 0"
+        routerLink="/admin/withdrawals"
+        [queryParams]="{ status: 'REQUESTED' }"
+      >
+        <span class="card__label">Withdrawals to review</span>
+        <span class="card__value fk-num">{{ c.withdrawalsRequested ?? '—' }}</span>
+        <span class="card__sub">{{ c.withdrawalsProcessing ?? '—' }} in processing</span>
+      </a>
+      <a class="card" routerLink="/admin/commissions">
+        <span class="card__label">Commissions available</span>
+        <span class="card__value fk-num">{{ c.commissionsAvailable ?? '—' }}</span>
+        <span class="card__sub">
+          {{ c.commissionsPending ?? '—' }} pending · {{ c.commissionsReversed ?? '—' }} reversed
+        </span>
+      </a>
+    </div>
+  } @else {
+    <div class="cards" aria-hidden="true">
+      @for (s of skeletons; track $index) {
+        <div class="card card--skeleton"><span></span><span></span></div>
+      }
+    </div>
+  }
+
+  <div class="panels">
+    <section class="panel">
+      <header class="panel__head">
+        <h2>Latest commissions</h2>
+        <a routerLink="/admin/commissions">View all</a>
+      </header>
+      @if (latestCommissions().length) {
+        <ul class="list">
+          @for (c of latestCommissions(); track c.id) {
+            <li>
+              <div class="list__main">
+                <span class="list__title">{{ beneficiaryName(c) }}</span>
+                <span class="list__meta">
+                  {{ c.reference }} · {{ c.occurredAt | date: 'mediumDate' }}
+                </span>
+              </div>
+              <span class="list__amount fk-num">{{ c.calculatedAmount | money }}</span>
+              <app-status-badge
+                [label]="commissionStatusLabelOf(c.status)"
+                [tone]="commissionTone(c.status)"
+              ></app-status-badge>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="muted">No commissions yet.</p>
+      }
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2>Withdrawals awaiting review</h2>
+        <a routerLink="/admin/withdrawals" [queryParams]="{ status: 'REQUESTED' }">Open queue</a>
+      </header>
+      @if (withdrawalsToAction().length) {
+        <ul class="list">
+          @for (w of withdrawalsToAction(); track w.id) {
+            <li>
+              <div class="list__main">
+                <span class="list__title">{{ beneficiaryName(w) }}</span>
+                <span class="list__meta">
+                  {{ w.reference }} · requested {{ w.requestedAt | date: 'mediumDate' }}
+                </span>
+              </div>
+              <span class="list__amount fk-num">{{ w.amount | money }}</span>
+              <app-status-badge
+                [label]="beneficiaryTypeLabelOf(w.beneficiaryType)"
+                tone="neutral"
+              ></app-status-badge>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="muted">Nothing waiting — the queue is clear.</p>
+      }
+    </section>
+  </div>
+
+  <nav class="reg" aria-label="Configuration">
+    <span class="reg__label">Configuration</span>
+    <a routerLink="/admin/partner-types">Partner types <b class="fk-num">{{ counts()?.partnerTypes ?? '—' }}</b></a>
+    <a routerLink="/admin/organisation-types">Organisation types <b class="fk-num">{{ counts()?.organisationTypes ?? '—' }}</b></a>
+    <a routerLink="/admin/referral-events">Referral events <b class="fk-num">{{ counts()?.referralEvents ?? '—' }}</b></a>
+    <a routerLink="/admin/incentive-rules">Incentive rules <b class="fk-num">{{ counts()?.incentiveRules ?? '—' }}</b></a>
+    <a routerLink="/admin/discount-rules">Discount rules <b class="fk-num">{{ counts()?.discountRules ?? '—' }}</b></a>
+  </nav>
+</section>

@@ -1,0 +1,29 @@
+<div class="icf" [class.icf--compact]="compact()">
+  <app-select-field
+    [control]="group().controls.kind"
+    [label]="label()"
+    [options]="kindOptions"
+    [hint]="hint()"
+  ></app-select-field>
+
+  @if (kind() === 'PERCENT') {
+    <app-text-field
+      [control]="group().controls.percent"
+      label="Percentage (%)"
+      type="number"
+      inputmode="decimal"
+      [errors]="{ min: 'Must be greater than 0.', max: 'Cannot exceed 100%.' }"
+      requiredMark
+    ></app-text-field>
+  }
+  @if (kind() === 'FIXED') {
+    <app-text-field
+      [control]="group().controls.amount"
+      label="Amount (₹)"
+      type="number"
+      inputmode="numeric"
+      [errors]="{ min: 'Must be at least ₹1.' }"
+      requiredMark
+    ></app-text-field>
+  }
+</div>

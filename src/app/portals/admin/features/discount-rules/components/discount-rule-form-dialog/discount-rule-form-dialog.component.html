@@ -1,0 +1,106 @@
+<app-dialog-shell
+  [title]="isEdit ? 'Edit discount rule' : 'New discount rule'"
+  [subtitle]="editing ? 'Version ' + editing.version + ' · ' + editing.scopeLabel : 'Customer discount definition'"
+  (dismissed)="cancel()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+    @if (genericError(); as msg) {
+      <app-alert tone="error" title="Could not save">{{ msg }}</app-alert>
+    }
+    @if (isEdit) {
+      <app-alert tone="info" title="Saving creates a new version">
+        Discounts already applied to customers are not recalculated. A customer can use a referral
+        discount only once in their lifetime.
+      </app-alert>
+    }
+
+    <app-text-field
+      [control]="form.controls.name"
+      label="Rule name"
+      placeholder="e.g. Hospital partners discount"
+      requiredMark
+    ></app-text-field>
+
+    <div class="grid">
+      <app-select-field
+        [control]="form.controls.scopeType"
+        label="Applies to"
+        [options]="scopeTypeOptions"
+        requiredMark
+      ></app-select-field>
+      @if (scopeType() !== 'GLOBAL') {
+        <app-select-field
+          [control]="form.controls.scopeId"
+          label="Which one"
+          placeholder="Select…"
+          [options]="scopeIdOptions()"
+          requiredMark
+        ></app-select-field>
+      }
+    </div>
+
+    <fieldset class="disc">
+      <legend>Customer discount</legend>
+      <app-select-field
+        [control]="form.controls.kind"
+        label="Discount type"
+        [options]="kindOptions"
+        requiredMark
+      ></app-select-field>
+
+      @if (kind() === 'PERCENT') {
+        <div class="grid">
+          <app-text-field
+            [control]="form.controls.percent"
+            label="Percentage (%)"
+            type="number"
+            inputmode="decimal"
+            [errors]="{ min: 'Must be greater than 0.', max: 'Cannot exceed 100%.' }"
+            requiredMark
+          ></app-text-field>
+          <app-text-field
+            [control]="form.controls.maxAmount"
+            label="Maximum discount (₹, optional)"
+            type="number"
+            inputmode="numeric"
+            hint="Leave blank for no cap."
+          ></app-text-field>
+        </div>
+      }
+      @if (kind() === 'FIXED') {
+        <app-text-field
+          [control]="form.controls.amount"
+          label="Fixed discount (₹)"
+          type="number"
+          inputmode="numeric"
+          [errors]="{ min: 'Must be at least ₹1.' }"
+          requiredMark
+        ></app-text-field>
+      }
+      @if (kind() === 'NONE') {
+        <p class="disc__none">Customers in this scope receive no referral discount.</p>
+      }
+    </fieldset>
+
+    <div class="grid">
+      <app-date-field
+        [control]="form.controls.effectiveFrom"
+        label="Effective from"
+        requiredMark
+      ></app-date-field>
+      <app-switch-field
+        [control]="form.controls.active"
+        label="Status"
+        onText="Active"
+        offText="Inactive"
+      ></app-switch-field>
+    </div>
+  </form>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    <app-button [loading]="saving()" (pressed)="submit()">
+      {{ isEdit ? 'Save new version' : 'Create discount rule' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

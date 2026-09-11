@@ -1,0 +1,32 @@
+<app-auth-layout
+  eyebrow="Admin portal"
+  heading="Sign in to FitKhao Admin"
+  subheading="Manage referral partners, incentive rules, commissions and withdrawals."
+  tagline="Referral Partner Management — Admin Console"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+    @if (error(); as err) {
+      <app-alert tone="error" title="Sign in failed">{{ err.message }}</app-alert>
+    }
+
+    <app-text-field
+      [control]="form.controls.identifier"
+      label="Work email"
+      type="email"
+      autocomplete="username"
+      inputmode="email"
+      placeholder="you@fitkhao.com"
+      requiredMark
+    ></app-text-field>
+
+    <app-text-field
+      [control]="form.controls.password"
+      label="Password"
+      type="password"
+      autocomplete="current-password"
+      requiredMark
+    ></app-text-field>
+
+    <app-button type="submit" size="lg" block [loading]="busy()">Sign in</app-button>
+  </form>
+</app-auth-layout>

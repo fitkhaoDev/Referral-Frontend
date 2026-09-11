@@ -1,0 +1,17 @@
+<section class="fk-page">
+  <app-page-header
+    title="Enrol organisation"
+    subtitle="Create an organisational partner. A Partner ID is assigned automatically on save."
+  >
+    <app-button actions variant="ghost" routerLink="/admin/organisations">Back</app-button>
+  </app-page-header>
+
+  <app-organisation-form
+    mode="create"
+    [typeOptions]="typeOptions()"
+    [saving]="saving()"
+    [saveError]="saveError()"
+    (save)="onSave($event)"
+    (cancel)="onCancel()"
+  ></app-organisation-form>
+</section>

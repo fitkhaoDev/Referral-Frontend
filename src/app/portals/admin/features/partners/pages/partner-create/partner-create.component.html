@@ -1,0 +1,17 @@
+<section class="fk-page">
+  <app-page-header
+    title="Enrol partner"
+    subtitle="Create an individual referral partner. A Partner ID is assigned automatically on save."
+  >
+    <app-button actions variant="ghost" routerLink="/admin/partners">Back to partners</app-button>
+  </app-page-header>
+
+  <app-partner-form
+    mode="create"
+    [partnerTypeOptions]="typeOptions()"
+    [saving]="saving()"
+    [saveError]="saveError()"
+    (save)="onSave($event)"
+    (cancel)="onCancel()"
+  ></app-partner-form>
+</section>

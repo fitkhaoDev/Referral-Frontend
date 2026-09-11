@@ -1,0 +1,12 @@
+<app-dialog-shell [title]="data.title" (dismissed)="cancel()">
+  <p class="msg">{{ data.message }}</p>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">
+      {{ data.cancelLabel || 'Cancel' }}
+    </app-button>
+    <app-button [variant]="data.tone === 'danger' ? 'danger' : 'primary'" (pressed)="confirm()">
+      {{ data.confirmLabel || 'Confirm' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

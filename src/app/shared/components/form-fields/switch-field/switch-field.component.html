@@ -1,0 +1,19 @@
+<div class="sw">
+  <label [for]="id" class="sw__label">
+    <input
+      type="checkbox"
+      role="switch"
+      [id]="id"
+      [formControl]="control()"
+      [attr.aria-describedby]="hint() ? id + '-hint' : null"
+    />
+    <span class="sw__track" aria-hidden="true"><span class="sw__thumb"></span></span>
+    <span class="sw__text">
+      {{ label() }}
+      <span class="sw__state">{{ checked() ? onText() : offText() }}</span>
+    </span>
+  </label>
+  @if (hint()) {
+    <p class="sw__hint" [id]="id + '-hint'">{{ hint() }}</p>
+  }
+</div>

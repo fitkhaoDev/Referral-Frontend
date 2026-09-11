@@ -1,0 +1,179 @@
+.head {
+  margin-bottom: var(--fk-space-6);
+}
+.sub {
+  color: var(--fk-muted);
+  margin-top: var(--fk-space-1);
+}
+
+/* ── stat cards ─────────────────────────────────────────────────────────── */
+.cards {
+  display: grid;
+  gap: var(--fk-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  margin-bottom: var(--fk-space-6);
+}
+.card {
+  background: var(--fk-white);
+  border: 1px solid var(--fk-border);
+  border-radius: var(--fk-radius-lg);
+  padding: var(--fk-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-2);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--fk-transition-fast), box-shadow var(--fk-transition-fast);
+}
+.card:hover {
+  border-color: var(--fk-green-strong, #0f7a4a);
+  box-shadow: var(--fk-focus-ring, 0 0 0 3px rgba(15, 122, 74, 0.15));
+}
+.card__label {
+  font-size: var(--fk-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fk-muted);
+}
+.card__value {
+  font-size: var(--fk-text-2xl, 1.75rem);
+  font-weight: var(--fk-weight-bold, 700);
+  color: var(--fk-ink, #1a2b22);
+  line-height: 1.1;
+}
+.card__sub {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-faint, #7a8a80);
+}
+.card--attention {
+  border-color: var(--fk-warning, #b4530a);
+  background: var(--fk-warning-soft, #fdf1e6);
+}
+.card--attention .card__value {
+  color: var(--fk-warning, #b4530a);
+}
+
+.card--skeleton {
+  gap: var(--fk-space-3);
+  pointer-events: none;
+}
+.card--skeleton span {
+  display: block;
+  border-radius: var(--fk-radius-sm);
+  background: var(--fk-surface-sunken);
+}
+.card--skeleton span:first-child {
+  height: 10px;
+  width: 55%;
+}
+.card--skeleton span:last-child {
+  height: 24px;
+  width: 40%;
+}
+
+/* ── panels ────────────────────────────────────────────────────────────── */
+.panels {
+  display: grid;
+  gap: var(--fk-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin-bottom: var(--fk-space-6);
+}
+.panel {
+  background: var(--fk-white);
+  border: 1px solid var(--fk-border);
+  border-radius: var(--fk-radius-lg);
+  padding: var(--fk-space-5);
+}
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--fk-space-3);
+}
+.panel__head h2 {
+  margin: 0;
+  font-size: var(--fk-text-md, 1rem);
+}
+.panel__head a {
+  font-size: var(--fk-text-sm);
+  color: var(--fk-green-strong, #0f7a4a);
+  text-decoration: none;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.list li {
+  display: flex;
+  align-items: center;
+  gap: var(--fk-space-3);
+  padding: var(--fk-space-3) 0;
+  border-top: 1px solid var(--fk-border);
+}
+.list li:first-child {
+  border-top: none;
+}
+.list__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.list__title {
+  font-size: var(--fk-text-sm);
+  font-weight: var(--fk-weight-semibold, 600);
+  color: var(--fk-ink, #1a2b22);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.list__meta {
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+}
+.list__amount {
+  font-size: var(--fk-text-sm);
+  font-weight: var(--fk-weight-semibold, 600);
+}
+
+.muted {
+  color: var(--fk-muted);
+  font-size: var(--fk-text-sm);
+  margin: var(--fk-space-2) 0 0;
+}
+
+/* ── configuration strip ───────────────────────────────────────────────── */
+.reg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fk-space-2) var(--fk-space-4);
+  padding: var(--fk-space-4);
+  border: 1px solid var(--fk-border);
+  border-radius: var(--fk-radius-lg);
+  background: var(--fk-surface-sunken, #f4f7f5);
+}
+.reg__label {
+  font-size: var(--fk-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fk-muted);
+  font-weight: var(--fk-weight-semibold, 600);
+}
+.reg a {
+  font-size: var(--fk-text-sm);
+  color: var(--fk-ink-2, #40514a);
+  text-decoration: none;
+}
+.reg a b {
+  color: var(--fk-ink, #1a2b22);
+  margin-left: 4px;
+}
+.reg a:hover {
+  color: var(--fk-green-strong, #0f7a4a);
+}

@@ -1,0 +1,13 @@
+<span class="logo">
+  <img
+    src="logo_app.png"
+    class="logo__img"
+    [width]="size()"
+    [height]="size()"
+    [alt]="showWordmark() ? '' : 'FitKhao'"
+    decoding="async"
+  />
+  @if (showWordmark()) {
+    <span class="logo__word">FitKhao</span>
+  }
+</span>

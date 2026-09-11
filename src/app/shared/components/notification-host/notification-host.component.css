@@ -1,0 +1,106 @@
+.host {
+  position: fixed;
+  z-index: var(--fk-z-toast);
+  top: var(--fk-space-4);
+  right: var(--fk-space-4);
+  left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-3);
+  width: min(360px, calc(100vw - 2 * var(--fk-space-4)));
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .host {
+    top: auto;
+    bottom: var(--fk-space-4);
+    left: var(--fk-space-4);
+    right: var(--fk-space-4);
+    width: auto;
+  }
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fk-space-3);
+  padding: var(--fk-space-3) var(--fk-space-4);
+  background: var(--fk-white);
+  border: 1px solid var(--fk-border);
+  border-left-width: 4px;
+  border-radius: var(--fk-radius-md);
+  box-shadow: var(--fk-shadow-lg);
+}
+.toast--success {
+  border-left-color: var(--fk-success);
+}
+.toast--error {
+  border-left-color: var(--fk-danger);
+}
+.toast--warning {
+  border-left-color: var(--fk-warning);
+}
+.toast--info {
+  border-left-color: var(--fk-info);
+}
+
+.toast__icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: var(--fk-weight-bold);
+  color: #fff;
+}
+.toast--success .toast__icon {
+  background: var(--fk-success);
+}
+.toast--error .toast__icon {
+  background: var(--fk-danger);
+}
+.toast--warning .toast__icon {
+  background: var(--fk-warning);
+}
+.toast--info .toast__icon {
+  background: var(--fk-info);
+}
+
+.toast__body {
+  flex: 1;
+  min-width: 0;
+}
+.toast__title {
+  font-weight: var(--fk-weight-semibold);
+  font-size: var(--fk-text-sm);
+}
+.toast__detail {
+  margin-top: 2px;
+  font-size: var(--fk-text-xs);
+  color: var(--fk-muted);
+}
+.toast__action {
+  margin-top: var(--fk-space-2);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--fk-text-sm);
+  font-weight: var(--fk-weight-semibold);
+  color: var(--fk-green-strong);
+  text-decoration: underline;
+}
+.toast__close {
+  flex: none;
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--fk-faint);
+  padding: 0 2px;
+}
+.toast__close:hover {
+  color: var(--fk-ink);
+}

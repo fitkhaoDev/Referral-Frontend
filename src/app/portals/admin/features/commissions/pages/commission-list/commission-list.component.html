@@ -1,0 +1,98 @@
+<section class="fk-page">
+  <app-page-header
+    title="Commissions"
+    subtitle="Every generated commission, its lifecycle and the rule snapshot used. Read-only."
+    [count]="facade.page().totalItems"
+  ></app-page-header>
+
+  <app-filter-bar
+    class="toolbar"
+    searchPlaceholder="Search reference, customer, code or transaction…"
+    [searchTerm]="facade.search()"
+    [activeCount]="facade.activeFilterCount()"
+    (searchChange)="onSearch($event)"
+    (clearAll)="onClearFilters()"
+  >
+    <app-date-field [control]="fromDate" label="From"></app-date-field>
+    <app-date-field [control]="toDate" label="To"></app-date-field>
+    <app-select-field [control]="statusFilter" label="Status" placeholder="Any" [options]="statusOptions"></app-select-field>
+    <app-select-field
+      [control]="beneficiaryFilter"
+      label="Beneficiary"
+      placeholder="Any"
+      [options]="beneficiaryOptions"
+    ></app-select-field>
+    <app-select-field
+      [control]="incentiveFilter"
+      label="Incentive"
+      placeholder="Any"
+      [options]="incentiveOptions"
+    ></app-select-field>
+    <app-select-field
+      [control]="organisationFilter"
+      label="Organisation"
+      placeholder="Any organisation"
+      [options]="organisationOptions()"
+    ></app-select-field>
+    <app-select-field
+      [control]="eventFilter"
+      label="Event"
+      placeholder="Any event"
+      [options]="eventOptions()"
+    ></app-select-field>
+  </app-filter-bar>
+
+  @if (facade.listError() && !facade.loading()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load commissions"
+      [message]="facade.listError()!.message"
+    >
+      <app-button variant="secondary" (pressed)="facade.reload()">Retry</app-button>
+    </app-empty-state>
+  } @else {
+    <app-data-table
+      [columns]="columns"
+      [rows]="facade.rows()"
+      [rowId]="rowId"
+      [sort]="facade.sort()"
+      [loading]="facade.loading()"
+      [pageSize]="facade.page().size"
+      clickableRows
+      caption="Commissions"
+      emptyTitle="No commissions match"
+      emptyMessage="Adjust your search, date range or filters."
+      (sortChange)="onSort($event)"
+      (rowActivate)="openDetail($event)"
+    >
+      <ng-template appColumnCell="reference" let-row>
+        <code class="code">{{ row.reference }}</code>
+      </ng-template>
+      <ng-template appColumnCell="rule" let-row>
+        <code class="code">{{ row.ruleSnapshot.ruleId }} v{{ row.ruleSnapshot.ruleVersion }}</code>
+      </ng-template>
+      <ng-template appColumnCell="calculatedAmount" let-row>
+        <span class="fk-num">{{ row.calculatedAmount | money }}</span>
+      </ng-template>
+      <ng-template appColumnCell="status" let-row>
+        <app-status-badge [label]="statusLabelOf(row)" [tone]="statusTone(row.status)"></app-status-badge>
+      </ng-template>
+      <ng-template appColumnCell="occurredAt" let-row>
+        <span class="when">
+          <span>{{ row.occurredAt | date: 'mediumDate' }}</span>
+          <span class="when__time">{{ row.occurredAt | date: 'shortTime' }}</span>
+        </span>
+      </ng-template>
+    </app-data-table>
+
+    @if (facade.page().totalItems > 0) {
+      <app-pagination
+        [page]="facade.page().page"
+        [size]="facade.page().size"
+        [totalItems]="facade.page().totalItems"
+        [disabled]="facade.loading()"
+        (pageChange)="onPage($event)"
+      ></app-pagination>
+    }
+  }
+</section>

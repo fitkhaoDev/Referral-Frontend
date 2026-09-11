@@ -1,0 +1,91 @@
+<section class="fk-page">
+  <app-page-header
+    title="Withdrawals"
+    subtitle="Review and process payout requests from partners, organisations and doctors."
+    [count]="facade.page().totalItems"
+  ></app-page-header>
+
+  @if (facade.policy(); as p) {
+    <app-alert tone="info" title="Withdrawal policy">
+      Minimum <span class="fk-num">{{ p.minAmount | money }}</span> per request ·
+      at most <span class="fk-num">{{ p.maxRequestsPerCalendarMonth }}</span> request(s) per calendar
+      month. Enforced by the backend when a request is made.
+    </app-alert>
+  }
+
+  <app-filter-bar
+    class="toolbar"
+    searchPlaceholder="Search reference, beneficiary or payment ref…"
+    [searchTerm]="facade.search()"
+    [activeCount]="facade.activeFilterCount()"
+    (searchChange)="onSearch($event)"
+    (clearAll)="onClearFilters()"
+  >
+    <app-select-field [control]="statusFilter" label="Status" placeholder="Any" [options]="statusOptions"></app-select-field>
+    <app-select-field
+      [control]="beneficiaryFilter"
+      label="Beneficiary"
+      placeholder="Any"
+      [options]="beneficiaryOptions"
+    ></app-select-field>
+    <app-select-field
+      [control]="organisationFilter"
+      label="Organisation"
+      placeholder="Any organisation"
+      [options]="organisationOptions()"
+    ></app-select-field>
+    <app-date-field [control]="fromDate" label="From"></app-date-field>
+    <app-date-field [control]="toDate" label="To"></app-date-field>
+  </app-filter-bar>
+
+  @if (facade.listError() && !facade.loading()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load withdrawals"
+      [message]="facade.listError()!.message"
+    >
+      <app-button variant="secondary" (pressed)="facade.reload()">Retry</app-button>
+    </app-empty-state>
+  } @else {
+    <app-data-table
+      [columns]="columns"
+      [rows]="facade.rows()"
+      [rowId]="rowId"
+      [sort]="facade.sort()"
+      [loading]="facade.loading()"
+      [pageSize]="facade.page().size"
+      clickableRows
+      caption="Withdrawals"
+      emptyTitle="No withdrawals match"
+      emptyMessage="Adjust your search, date range or filters."
+      (sortChange)="onSort($event)"
+      (rowActivate)="view($event)"
+    >
+      <ng-template appColumnCell="reference" let-row>
+        <code class="code">{{ row.reference }}</code>
+      </ng-template>
+      <ng-template appColumnCell="amount" let-row>
+        <span class="fk-num">{{ row.amount | money }}</span>
+      </ng-template>
+      <ng-template appColumnCell="status" let-row>
+        <app-status-badge [label]="statusLabelOf(row)" [tone]="statusTone(row.status)"></app-status-badge>
+      </ng-template>
+      <ng-template appColumnCell="requestedAt" let-row>
+        <span class="when">
+          <span>{{ row.requestedAt | date: 'mediumDate' }}</span>
+          <span class="when__time">{{ row.requestedAt | date: 'shortTime' }}</span>
+        </span>
+      </ng-template>
+    </app-data-table>
+
+    @if (facade.page().totalItems > 0) {
+      <app-pagination
+        [page]="facade.page().page"
+        [size]="facade.page().size"
+        [totalItems]="facade.page().totalItems"
+        [disabled]="facade.loading()"
+        (pageChange)="onPage($event)"
+      ></app-pagination>
+    }
+  }
+</section>

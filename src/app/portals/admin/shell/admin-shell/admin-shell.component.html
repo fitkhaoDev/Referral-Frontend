@@ -1,0 +1,83 @@
+<div class="shell">
+  @if (loading.active()) {
+    <div class="shell__progress" role="progressbar" aria-label="Loading"></div>
+  }
+
+  <a class="fk-visually-hidden" href="#admin-main">Skip to main content</a>
+
+  <header class="topbar">
+    <button
+      type="button"
+      class="topbar__menu"
+      aria-label="Toggle navigation"
+      [attr.aria-expanded]="navOpen()"
+      aria-controls="admin-nav"
+      (click)="toggleNav()"
+    >
+      <span class="topbar__menu-bar"></span>
+    </button>
+
+    <a routerLink="/admin/dashboard" class="topbar__brand" aria-label="FitKhao Admin home">
+      <app-logo [size]="30" [showWordmark]="false"></app-logo>
+      <span class="topbar__portal">Admin</span>
+    </a>
+
+    <div class="topbar__spacer"></div>
+
+    <div class="usermenu">
+      <button
+        type="button"
+        class="usermenu__trigger"
+        [attr.aria-expanded]="userMenuOpen()"
+        (click)="toggleUserMenu()"
+      >
+        <span class="usermenu__avatar" aria-hidden="true">{{ (user()?.displayName || 'A')[0] }}</span>
+        <span class="usermenu__name">{{ user()?.displayName }}</span>
+      </button>
+      @if (userMenuOpen()) {
+        <div class="usermenu__panel" role="menu">
+          <p class="usermenu__email">{{ user()?.email }}</p>
+          <a routerLink="/admin/profile" role="menuitem" (click)="userMenuOpen.set(false)">Profile</a>
+          <button type="button" role="menuitem" (click)="signOut()">Sign out</button>
+        </div>
+      }
+    </div>
+  </header>
+
+  @if (navOpen()) {
+    <button
+      type="button"
+      class="shell__scrim"
+      aria-label="Close navigation"
+      (click)="closeNav()"
+    ></button>
+  }
+
+  <nav id="admin-nav" class="sidenav" [class.sidenav--open]="navOpen()" aria-label="Admin sections">
+    @for (group of groups(); track group.heading) {
+      <div class="sidenav__group">
+        <p class="sidenav__heading">{{ group.heading }}</p>
+        <ul>
+          @for (item of group.items; track item.path) {
+            <li>
+              <a
+                [routerLink]="item.path"
+                routerLinkActive="is-active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                (click)="closeNav()"
+              >
+                {{ item.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </nav>
+
+  <main id="admin-main" class="content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-notification-host></app-notification-host>
+</div>

@@ -1,0 +1,75 @@
+<app-dialog-shell
+  [title]="isEdit ? 'Edit member' : 'Add organisation member'"
+  [subtitle]="editing ? editing.organisationName : 'Doctor / account under an organisation'"
+  (dismissed)="cancel()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+    @if (genericError(); as msg) {
+      <app-alert tone="error" title="Could not save">{{ msg }}</app-alert>
+    }
+
+    <app-select-field
+      [control]="form.controls.organisationId"
+      label="Organisation"
+      placeholder="Select an organisation"
+      [options]="orgOptions()"
+      [hint]="
+        isEdit
+          ? 'A member cannot be moved between organisations.'
+          : lockedOrgId
+            ? 'Adding to this organisation.'
+            : ''
+      "
+      requiredMark
+    ></app-select-field>
+
+    <app-text-field
+      [control]="form.controls.name"
+      label="Full name"
+      autocomplete="name"
+      placeholder="e.g. Dr. John Doe"
+      requiredMark
+    ></app-text-field>
+
+    <app-text-field
+      [control]="form.controls.specialisation"
+      label="Specialisation"
+      placeholder="e.g. Cardiology (optional)"
+    ></app-text-field>
+
+    <app-text-field
+      [control]="form.controls.mobile"
+      label="Mobile number"
+      type="tel"
+      inputmode="tel"
+      autocomplete="tel"
+      placeholder="+91 98765 43210"
+      [errors]="{ pattern: 'Enter a valid phone number.' }"
+      requiredMark
+    ></app-text-field>
+
+    <app-text-field
+      [control]="form.controls.email"
+      label="Email"
+      type="email"
+      inputmode="email"
+      autocomplete="email"
+      placeholder="doctor@organisation.example.com"
+      requiredMark
+    ></app-text-field>
+
+    <app-switch-field
+      [control]="form.controls.active"
+      label="Status"
+      onText="Active"
+      offText="Inactive"
+    ></app-switch-field>
+  </form>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    <app-button [loading]="saving()" (pressed)="submit()">
+      {{ isEdit ? 'Save changes' : 'Add member' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

@@ -1,0 +1,132 @@
+@let templates = cellTemplates();
+
+@if (showEmpty()) {
+  <app-empty-state [title]="emptyTitle()" [message]="emptyMessage()">
+    <ng-content select="[empty-actions]"></ng-content>
+  </app-empty-state>
+} @else if (isCompact()) {
+  <ul class="dt-cards" [attr.aria-busy]="loading() || null">
+    @if (loading() && rows().length === 0) {
+      @for (s of skeletonRows(); track $index) {
+        <li class="dt-card dt-card--skeleton">
+          <span class="sk sk--title"></span>
+          <span class="sk sk--line"></span>
+          <span class="sk sk--line"></span>
+        </li>
+      }
+    } @else {
+      @for (row of rows(); track trackRow($index, row)) {
+        <li
+          class="dt-card"
+          [class.dt-card--clickable]="clickableRows()"
+          [attr.tabindex]="clickableRows() ? 0 : null"
+          [attr.role]="clickableRows() ? 'button' : null"
+          (click)="onRowActivate(row)"
+          (keydown)="onRowKey($event, row)"
+        >
+          @if (primaryCols().length) {
+            <div class="dt-card__head">
+              @for (col of primaryCols(); track col.key; let first = $first) {
+                <span [class]="first ? 'dt-card__title' : 'dt-card__meta'">
+                  @if (templates.get(col.key); as tpl) {
+                    <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row }"></ng-container>
+                  } @else {
+                    {{ cellText(col, row) }}
+                  }
+                </span>
+              }
+            </div>
+          }
+          <dl class="dt-card__list">
+            @for (col of cardDetailCols(); track col.key) {
+              <div class="dt-card__row">
+                <dt>{{ col.header }}</dt>
+                <dd>
+                  @if (templates.get(col.key); as tpl) {
+                    <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row }"></ng-container>
+                  } @else {
+                    {{ cellText(col, row) }}
+                  }
+                </dd>
+              </div>
+            }
+          </dl>
+        </li>
+      }
+    }
+  </ul>
+} @else {
+  <div class="dt-scroll">
+    <table class="dt" [attr.aria-busy]="loading() || null">
+      @if (caption()) {
+        <caption class="fk-visually-hidden">{{ caption() }}</caption>
+      }
+      <thead>
+        <tr>
+          @for (col of columns(); track col.key) {
+            <th
+              scope="col"
+              [style.width]="col.width || null"
+              [class.dt--end]="col.align === 'end'"
+              [class.dt--center]="col.align === 'center'"
+              [class.dt--hide-mobile]="col.hideOnMobile"
+              [attr.aria-sort]="ariaSort(col)"
+            >
+              @if (col.sortable) {
+                <button type="button" class="dt__sort" (click)="onHeaderClick(col)">
+                  <span>{{ col.header }}</span>
+                  <span class="dt__sort-ind" aria-hidden="true">
+                    {{
+                      ariaSort(col) === 'ascending'
+                        ? '▲'
+                        : ariaSort(col) === 'descending'
+                          ? '▼'
+                          : '↕'
+                    }}
+                  </span>
+                </button>
+              } @else {
+                <span [attr.aria-label]="col.ariaLabel || null">{{ col.header }}</span>
+              }
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading() && rows().length === 0) {
+          @for (s of skeletonRows(); track $index) {
+            <tr class="dt__skeleton-row">
+              @for (col of columns(); track col.key) {
+                <td [class.dt--hide-mobile]="col.hideOnMobile"><span class="sk sk--cell"></span></td>
+              }
+            </tr>
+          }
+        } @else {
+          @for (row of rows(); track trackRow($index, row)) {
+            <tr
+              [class.dt__row--clickable]="clickableRows()"
+              [attr.tabindex]="clickableRows() ? 0 : null"
+              [attr.role]="clickableRows() ? 'button' : null"
+              (click)="onRowActivate(row)"
+              (keydown)="onRowKey($event, row)"
+            >
+              @for (col of columns(); track col.key) {
+                <td
+                  [class.dt--end]="col.align === 'end'"
+                  [class.dt--center]="col.align === 'center'"
+                  [class.dt--hide-mobile]="col.hideOnMobile"
+                >
+                  @if (templates.get(col.key); as tpl) {
+                    <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row, row: row }"></ng-container>
+                  } @else {
+                    {{ cellText(col, row) }}
+                  }
+                </td>
+              }
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+}

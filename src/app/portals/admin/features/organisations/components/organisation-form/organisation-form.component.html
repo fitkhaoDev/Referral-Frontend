@@ -1,0 +1,116 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate class="oform">
+  @if (saveError() && !saveError()!.fieldErrors && saveError()!.status !== 422) {
+    <app-alert tone="error" title="Could not save">{{ saveError()!.message }}</app-alert>
+  }
+
+  <fieldset class="oform__section">
+    <legend>Organisation</legend>
+    <div class="oform__grid">
+      <app-text-field
+        [control]="form.controls.name"
+        label="Organisation name"
+        placeholder="e.g. Apollo Hospital — Dum Dum"
+        requiredMark
+      ></app-text-field>
+      <app-select-field
+        [control]="form.controls.organisationTypeId"
+        label="Organisation type"
+        placeholder="Select an organisation type"
+        [options]="typeOptions()"
+        requiredMark
+      ></app-select-field>
+    </div>
+    <label class="oform__field">
+      <span class="oform__label">Address</span>
+      <textarea
+        rows="2"
+        formControlName="address"
+        placeholder="Full centre address"
+      ></textarea>
+    </label>
+  </fieldset>
+
+  <fieldset class="oform__section">
+    <legend>Primary contact</legend>
+    <div class="oform__grid">
+      <app-text-field
+        [control]="form.controls.contactPerson"
+        label="Contact person"
+        autocomplete="name"
+        placeholder="e.g. Sunita Basu"
+        requiredMark
+      ></app-text-field>
+      <app-text-field
+        [control]="form.controls.mobile"
+        label="Mobile number"
+        type="tel"
+        inputmode="tel"
+        placeholder="+91 98765 43210"
+        [errors]="{ pattern: 'Enter a valid phone number.' }"
+        requiredMark
+      ></app-text-field>
+      <app-text-field
+        [control]="form.controls.email"
+        label="Email"
+        type="email"
+        inputmode="email"
+        placeholder="partnerships@organisation.example.com"
+        requiredMark
+      ></app-text-field>
+    </div>
+  </fieldset>
+
+  @if (mode() === 'create') {
+    <fieldset class="oform__section">
+      <legend>Account</legend>
+
+      <div class="oform__code">
+        <app-text-field
+          [control]="form.controls.referralCode"
+          label="Organisation referral / coupon code"
+          placeholder="e.g. APOLLO-DUMDUM"
+          hint="One code per centre. Uppercase letters, numbers and hyphens. Cannot be changed later."
+          [errors]="{ pattern: '4–32 characters: A–Z, 0–9 and hyphens only.' }"
+          requiredMark
+        ></app-text-field>
+        <app-button type="button" variant="secondary" size="sm" (pressed)="suggestCode()">
+          Suggest
+        </app-button>
+      </div>
+
+      <div class="oform__grid">
+        <app-text-field
+          [control]="form.controls.initialPassword"
+          label="Temporary password"
+          type="password"
+          autocomplete="new-password"
+          hint="The organisation must change this on first sign in. Min 8 chars, upper, lower and a number."
+          [errors]="{ weakPassword: 'Use a stronger password.' }"
+          requiredMark
+        ></app-text-field>
+        <app-text-field
+          [control]="form.controls.confirmPassword"
+          label="Confirm temporary password"
+          type="password"
+          autocomplete="new-password"
+          [errors]="{ mismatch: 'Passwords do not match.' }"
+          requiredMark
+        ></app-text-field>
+      </div>
+
+      <app-switch-field
+        [control]="form.controls.status"
+        label="Activate account now"
+        onText="Active"
+        offText="Inactive"
+      ></app-switch-field>
+    </fieldset>
+  }
+
+  <div class="oform__actions">
+    <app-button type="button" variant="secondary" (pressed)="onCancel()">Cancel</app-button>
+    <app-button type="submit" [loading]="saving()">
+      {{ mode() === 'create' ? 'Enrol organisation' : 'Save changes' }}
+    </app-button>
+  </div>
+</form>

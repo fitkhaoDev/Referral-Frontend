@@ -1,0 +1,72 @@
+<app-dialog-shell
+  [title]="txn.reference"
+  [subtitle]="typeLabel[txn.type] + ' · ' + (txn.occurredAt | date: 'medium')"
+  (dismissed)="close()"
+>
+  <div class="wt">
+    <div class="wt__headline">
+      <span
+        class="wt__amount fk-num"
+        [class.wt__amount--credit]="txn.direction === 'CREDIT'"
+        [class.wt__amount--debit]="txn.direction === 'DEBIT'"
+      >
+        {{ txn.direction === 'DEBIT' ? '−' : '+' }}{{ txn.amount | money }}
+      </span>
+      <app-status-badge
+        [label]="statusLabel[txn.status]"
+        [tone]="statusTone(txn.status)"
+      ></app-status-badge>
+    </div>
+
+    <section aria-label="Details">
+      <h3>Details</h3>
+      <dl>
+        <div><dt>Type</dt><dd>{{ typeLabel[txn.type] }}</dd></div>
+        <div><dt>Direction</dt><dd>{{ txn.direction === 'CREDIT' ? 'Credit' : 'Debit' }}</dd></div>
+        @if (txn.customerRef) {
+          <div><dt>Customer</dt><dd class="fk-num">{{ txn.customerRef }}</dd></div>
+        }
+        @if (txn.eventName) {
+          <div><dt>Event</dt><dd>{{ txn.eventName }}</dd></div>
+        }
+        @if (txn.incentiveRate) {
+          <div><dt>Incentive rate</dt><dd class="fk-num">{{ txn.incentiveRate }}</dd></div>
+        }
+        @if (txn.eligibleAmount) {
+          <div><dt>Eligible base</dt><dd class="fk-num">{{ txn.eligibleAmount | money }}</dd></div>
+        }
+        @if (txn.organisationName) {
+          <div><dt>Organisation</dt><dd>{{ txn.organisationName }}</dd></div>
+        }
+        @if (txn.memberName) {
+          <div><dt>Doctor</dt><dd>{{ txn.memberName }}</dd></div>
+        }
+        @if (txn.commissionRef) {
+          <div><dt>Commission</dt><dd class="fk-num">{{ txn.commissionRef }}</dd></div>
+        }
+        <div><dt>Occurred</dt><dd>{{ txn.occurredAt | date: 'medium' }}</dd></div>
+      </dl>
+      @if (txn.note) {
+        <p class="wt__note">{{ txn.note }}</p>
+      }
+    </section>
+
+    @if (isReversal) {
+      <app-alert tone="warning" title="Reversal">
+        This is a separate debit recorded against an earlier commission credit. The original credit
+        row is retained unchanged for audit. Any amount not yet recovered is shown as
+        “Recovery outstanding” on the wallet and is deducted from future incentives.
+      </app-alert>
+    }
+    @if (isRecovery) {
+      <app-alert tone="info" title="Recovery">
+        A previously reversed commission was recovered here by reducing a later incentive. The
+        backend decides how much of an incentive is applied to an outstanding recovery.
+      </app-alert>
+    }
+  </div>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="close()">Close</app-button>
+  </div>
+</app-dialog-shell>

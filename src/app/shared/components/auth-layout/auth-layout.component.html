@@ -1,0 +1,22 @@
+<div class="auth">
+  <aside class="auth__brand" aria-hidden="true">
+    <div class="auth__brand-inner">
+      <app-logo [size]="52" [showWordmark]="false"></app-logo>
+      <p class="auth__tagline">{{ tagline() }}</p>
+    </div>
+  </aside>
+
+  <main class="auth__main">
+    <div class="auth__card">
+      <div class="auth__card-head">
+        <span class="auth__mobile-logo"><app-logo [size]="40"></app-logo></span>
+        <p class="auth__eyebrow">{{ eyebrow() }}</p>
+        <h1 class="auth__title">{{ heading() }}</h1>
+        @if (subheading()) {
+          <p class="auth__sub">{{ subheading() }}</p>
+        }
+      </div>
+      <ng-content></ng-content>
+    </div>
+  </main>
+</div>

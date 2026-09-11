@@ -1,0 +1,99 @@
+<section class="fk-page">
+  <app-page-header
+    title="Referral events"
+    subtitle="Configurable points in the referral lifecycle the incentive engine reacts to."
+    [count]="facade.page().totalItems"
+  >
+    <app-button actions (pressed)="openCreate()">New referral event</app-button>
+  </app-page-header>
+
+  <app-filter-bar
+    class="toolbar"
+    searchPlaceholder="Search name or code…"
+    [searchTerm]="facade.search()"
+    [activeCount]="facade.activeFilterCount()"
+    (searchChange)="onSearch($event)"
+    (clearAll)="onClearFilters()"
+  >
+    <app-select-field
+      [control]="statusFilter"
+      label="Status"
+      placeholder="Any status"
+      [options]="statusOptions"
+    ></app-select-field>
+    <app-select-field
+      [control]="systemFilter"
+      label="Kind"
+      placeholder="Any kind"
+      [options]="systemOptions"
+    ></app-select-field>
+  </app-filter-bar>
+
+  @if (facade.listError() && !facade.loading()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load referral events"
+      [message]="facade.listError()!.message"
+    >
+      <app-button variant="secondary" (pressed)="facade.reload()">Retry</app-button>
+    </app-empty-state>
+  } @else {
+    <app-data-table
+      [columns]="columns"
+      [rows]="facade.rows()"
+      [rowId]="rowId"
+      [sort]="facade.sort()"
+      [loading]="facade.loading()"
+      [pageSize]="facade.page().size"
+      caption="Referral events"
+      emptyTitle="No referral events match"
+      emptyMessage="Adjust your search or filters, or add a new event."
+      (sortChange)="onSort($event)"
+    >
+      <ng-template appColumnCell="sortOrder" let-row>
+        <span class="fk-num">{{ row.sortOrder }}</span>
+      </ng-template>
+
+      <ng-template appColumnCell="code" let-row>
+        <code class="code">{{ row.code }}</code>
+      </ng-template>
+
+      <ng-template appColumnCell="system" let-row>
+        <app-status-badge
+          [label]="row.system ? 'System' : 'Custom'"
+          [tone]="row.system ? 'info' : 'neutral'"
+        ></app-status-badge>
+      </ng-template>
+
+      <ng-template appColumnCell="status" let-row>
+        <app-status-badge
+          [label]="statusLabel(row.status)"
+          [tone]="statusTone(row.status)"
+        ></app-status-badge>
+      </ng-template>
+
+      <ng-template appColumnCell="actions" let-row>
+        <div class="row-actions">
+          <app-button variant="ghost" size="sm" (pressed)="openEdit(row)">Edit</app-button>
+          <app-button
+            [variant]="row.status === 'ACTIVE' ? 'secondary' : 'primary'"
+            size="sm"
+            (pressed)="toggleStatus(row)"
+          >
+            {{ row.status === 'ACTIVE' ? 'Deactivate' : 'Reactivate' }}
+          </app-button>
+        </div>
+      </ng-template>
+    </app-data-table>
+
+    @if (facade.page().totalItems > 0) {
+      <app-pagination
+        [page]="facade.page().page"
+        [size]="facade.page().size"
+        [totalItems]="facade.page().totalItems"
+        [disabled]="facade.loading()"
+        (pageChange)="onPage($event)"
+      ></app-pagination>
+    }
+  }
+</section>

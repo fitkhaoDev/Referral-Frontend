@@ -1,0 +1,70 @@
+<div class="rif">
+  <app-select-field
+    [control]="group().controls.kind"
+    label="Renewal incentive"
+    [options]="kindOptions"
+  ></app-select-field>
+
+  @switch (kind()) {
+    @case ('PERCENT_INDEFINITE') {
+      <app-text-field
+        [control]="group().controls.percent"
+        label="Percentage (%) — every renewal"
+        type="number"
+        inputmode="decimal"
+        [errors]="{ min: 'Must be greater than 0.', max: 'Cannot exceed 100%.' }"
+        requiredMark
+      ></app-text-field>
+    }
+    @case ('FIXED_INDEFINITE') {
+      <app-text-field
+        [control]="group().controls.amount"
+        label="Amount (₹) — every renewal"
+        type="number"
+        inputmode="numeric"
+        [errors]="{ min: 'Must be at least ₹1.' }"
+        requiredMark
+      ></app-text-field>
+    }
+    @case ('PER_RENEWAL') {
+      <div class="rif__tiers">
+        @for (tier of group().controls.tiers.controls; track tier; let i = $index) {
+          <div class="rif__tier">
+            <div class="rif__tier-head">
+              <span class="rif__tier-label">Renewal #{{ i + 1 }}</span>
+              @if (group().controls.tiers.length > 1) {
+                <button
+                  type="button"
+                  class="rif__remove"
+                  [attr.aria-label]="'Remove renewal #' + (i + 1)"
+                  (click)="removeTier(i)"
+                >
+                  Remove
+                </button>
+              }
+            </div>
+            <app-incentive-component-field
+              [group]="tier"
+              label="Incentive"
+              compact
+            ></app-incentive-component-field>
+          </div>
+        }
+
+        <button type="button" class="rif__add" (click)="addTier()">+ Add renewal tier</button>
+
+        <div class="rif__tier rif__beyond">
+          <span class="rif__tier-label">
+            Renewal #{{ group().controls.tiers.length + 1 }} onward
+          </span>
+          <app-incentive-component-field
+            [group]="group().controls.beyondLastTier"
+            label="Incentive"
+            hint="Applies to every renewal after the last tier above."
+            compact
+          ></app-incentive-component-field>
+        </div>
+      </div>
+    }
+  }
+</div>

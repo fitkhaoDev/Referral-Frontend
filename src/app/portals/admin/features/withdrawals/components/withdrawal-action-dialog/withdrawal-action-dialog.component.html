@@ -1,0 +1,39 @@
+<app-dialog-shell [title]="title" (dismissed)="cancel()">
+  <div class="wad">
+    <p class="wad__body">{{ bodyText }}</p>
+
+    <dl class="wad__summary">
+      <div><dt>Amount</dt><dd class="fk-num">{{ withdrawal.amount | money }}</dd></div>
+      <div><dt>Payout to</dt><dd class="fk-num">{{ withdrawal.payoutDestination }}</dd></div>
+    </dl>
+
+    @if (needsReason) {
+      <app-text-field
+        [control]="reason"
+        [label]="action === 'REJECT' ? 'Reason for rejection' : 'Reason for failure'"
+        requiredMark
+        hint="Shared with the finance audit trail."
+      ></app-text-field>
+    }
+
+    @if (needsPaymentRef) {
+      <app-text-field
+        [control]="paymentReference"
+        label="Payment reference"
+        requiredMark
+        hint="Bank UTR or UPI transaction id from the payout."
+      ></app-text-field>
+    }
+
+    @if (genericError(); as message) {
+      <app-alert tone="error" title="Could not complete">{{ message }}</app-alert>
+    }
+  </div>
+
+  <div footer>
+    <app-button variant="ghost" (pressed)="cancel()">Cancel</app-button>
+    <app-button [variant]="confirmTone" [loading]="acting()" (pressed)="submit()">
+      {{ actionLabel }}
+    </app-button>
+  </div>
+</app-dialog-shell>

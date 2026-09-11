@@ -1,0 +1,111 @@
+/**
+ * FitKhao design tokens.
+ *
+ * Primary surface = white. Green is an ACCENT only: primary CTA, active state,
+ * success, and positive money. Structure (backgrounds, cards, borders, secondary
+ * text) stays neutral. Meaning is never carried by colour alone — always pair with
+ * an icon or text.
+ *
+ * Hex values are provisional, sampled from the supplied logo. Replace with the
+ * official brand palette when available (single source of truth: this file).
+ */
+:root {
+  /* Brand ------------------------------------------------------------------ */
+  --fk-green: #4ca11e;
+  --fk-green-strong: #3c8517;
+  --fk-green-soft: #6cbb43;
+  --fk-green-tint: #eef7e8;
+  --fk-green-tint-strong: #dcefce;
+
+  /* Neutrals ------------------------------------------------------------- */
+  --fk-white: #ffffff;
+  --fk-surface: #ffffff;
+  --fk-surface-muted: #f6f8f6;
+  --fk-surface-sunken: #eef1ee;
+  --fk-ink: #1b2a1e;
+  --fk-ink-2: #3a463c;
+  --fk-muted: #5f6b62;
+  --fk-faint: #8b958d;
+  --fk-border: #e4e8e4;
+  --fk-border-strong: #cdd4ce;
+
+  /* Status (paired with icon/label everywhere) ------------------------- */
+  --fk-success: #2e7d1f;
+  --fk-success-tint: #e8f4e3;
+  --fk-warning: #9a6b00;
+  --fk-warning-tint: #fbf1d9;
+  --fk-danger: #b3261e;
+  --fk-danger-tint: #fbe9e7;
+  --fk-info: #1f5b7d;
+  --fk-info-tint: #e3eef4;
+  --fk-neutral-tint: #eef1ee;
+
+  /* Money semantics --------------------------------------------------- */
+  --fk-money-positive: var(--fk-success);
+  --fk-money-negative: var(--fk-danger);
+
+  /* Typography ------------------------------------------------------- */
+  --fk-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --fk-font-num: 'Inter', ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+  --fk-text-xs: 0.75rem;
+  --fk-text-sm: 0.8125rem;
+  --fk-text-base: 0.875rem;
+  --fk-text-md: 1rem;
+  --fk-text-lg: 1.125rem;
+  --fk-text-xl: 1.375rem;
+  --fk-text-2xl: 1.75rem;
+  --fk-text-3xl: 2.25rem;
+  --fk-weight-regular: 400;
+  --fk-weight-medium: 500;
+  --fk-weight-semibold: 600;
+  --fk-weight-bold: 700;
+  --fk-leading: 1.5;
+
+  /* Spacing (4px base) -------------------------------------------- */
+  --fk-space-1: 0.25rem;
+  --fk-space-2: 0.5rem;
+  --fk-space-3: 0.75rem;
+  --fk-space-4: 1rem;
+  --fk-space-5: 1.25rem;
+  --fk-space-6: 1.5rem;
+  --fk-space-8: 2rem;
+  --fk-space-10: 2.5rem;
+  --fk-space-12: 3rem;
+  --fk-space-16: 4rem;
+
+  /* Radius ----------------------------------------------------- */
+  --fk-radius-sm: 6px;
+  --fk-radius-md: 10px;
+  --fk-radius-lg: 16px;
+  --fk-radius-pill: 999px;
+
+  /* Elevation ----------------------------------------------- */
+  --fk-shadow-xs: 0 1px 2px rgba(27, 42, 30, 0.06);
+  --fk-shadow-sm: 0 1px 3px rgba(27, 42, 30, 0.08), 0 1px 2px rgba(27, 42, 30, 0.06);
+  --fk-shadow-md: 0 4px 12px rgba(27, 42, 30, 0.1);
+  --fk-shadow-lg: 0 12px 32px rgba(27, 42, 30, 0.14);
+
+  /* Focus ring (visible, non-colour-only) --------------- */
+  --fk-focus-ring: 0 0 0 3px rgba(76, 161, 30, 0.35);
+  --fk-focus-outline: 2px solid var(--fk-green-strong);
+
+  /* Layout ------------------------------------------- */
+  --fk-sidebar-width: 248px;
+  --fk-topbar-height: 60px;
+  --fk-content-max: 1360px;
+  --fk-z-drawer: 900;
+  --fk-z-modal: 1000;
+  --fk-z-toast: 1100;
+
+  /* Motion ----------------------------------------- */
+  --fk-transition-fast: 120ms ease;
+  --fk-transition: 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fk-transition-fast: 0ms;
+    --fk-transition: 0ms;
+  }
+}

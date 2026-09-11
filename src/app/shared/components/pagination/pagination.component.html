@@ -1,0 +1,31 @@
+<nav class="pg" aria-label="Pagination">
+  <p class="pg__range" aria-live="polite">
+    <span class="fk-num">{{ rangeStart() }}</span>–<span class="fk-num">{{ rangeEnd() }}</span>
+    of <span class="fk-num">{{ totalItems() }}</span>
+  </p>
+
+  <div class="pg__controls">
+    <label class="pg__size">
+      <span class="pg__size-label">Per page</span>
+      <select
+        [value]="size()"
+        [disabled]="disabled()"
+        (change)="onSizeChange($any($event.target).value)"
+      >
+        @for (opt of pageSizeOptions(); track opt) {
+          <option [value]="opt">{{ opt }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="pg__nav">
+      <button type="button" (click)="prev()" [disabled]="!canPrev()" aria-label="Previous page">
+        ‹ Prev
+      </button>
+      <span class="pg__page fk-num">Page {{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="next()" [disabled]="!canNext()" aria-label="Next page">
+        Next ›
+      </button>
+    </div>
+  </div>
+</nav>

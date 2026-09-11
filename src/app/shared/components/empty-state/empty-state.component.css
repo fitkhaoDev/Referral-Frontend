@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+.empty {
+  text-align: center;
+  padding: var(--fk-space-12) var(--fk-space-6);
+  border: 1px dashed var(--fk-border-strong);
+  border-radius: var(--fk-radius-lg);
+  background: var(--fk-surface-muted);
+}
+.empty--error {
+  border-color: color-mix(in srgb, var(--fk-danger) 40%, transparent);
+  background: var(--fk-danger-tint);
+}
+.empty__title {
+  font-weight: var(--fk-weight-semibold);
+  color: var(--fk-ink);
+}
+.empty__message {
+  margin-top: var(--fk-space-2);
+  color: var(--fk-muted);
+  font-size: var(--fk-text-sm);
+  max-width: 46ch;
+  margin-inline: auto;
+}
+.empty__actions {
+  margin-top: var(--fk-space-4);
+  display: flex;
+  gap: var(--fk-space-2);
+  justify-content: center;
+}

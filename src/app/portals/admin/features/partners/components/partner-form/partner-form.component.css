@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+
+.pform {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-6);
+}
+
+.pform__section {
+  border: 1px solid var(--fk-border);
+  border-radius: var(--fk-radius-lg);
+  padding: var(--fk-space-5);
+  margin: 0;
+  background: var(--fk-white);
+}
+.pform__section legend {
+  font-size: var(--fk-text-xs);
+  font-weight: var(--fk-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fk-faint);
+  padding: 0 var(--fk-space-2);
+}
+
+.pform__grid {
+  display: grid;
+  gap: var(--fk-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.pform__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-2);
+  margin-top: var(--fk-space-4);
+}
+.pform__label {
+  font-size: var(--fk-text-sm);
+  font-weight: var(--fk-weight-semibold);
+  color: var(--fk-ink-2);
+}
+.pform__field textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: var(--fk-space-3);
+  font: inherit;
+  font-size: var(--fk-text-md);
+  color: var(--fk-ink);
+  background: var(--fk-white);
+  border: 1px solid var(--fk-border-strong);
+  border-radius: var(--fk-radius-md);
+  resize: vertical;
+}
+.pform__field textarea:focus {
+  outline: none;
+  border-color: var(--fk-green-strong);
+  box-shadow: var(--fk-focus-ring);
+}
+
+.pform__code {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--fk-space-3);
+  align-items: end;
+  margin-bottom: var(--fk-space-4);
+}
+.pform__code app-button {
+  padding-bottom: 2px;
+}
+
+.pform__section app-switch-field {
+  display: block;
+  margin-top: var(--fk-space-4);
+}
+
+.pform__actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--fk-space-3);
+  padding: var(--fk-space-4) 0;
+  background: linear-gradient(to top, var(--fk-surface-muted) 60%, transparent);
+}
+
+@media (max-width: 560px) {
+  .pform__actions {
+    flex-direction: column-reverse;
+  }
+  .pform__actions app-button {
+    width: 100%;
+  }
+  .pform__code {
+    grid-template-columns: 1fr;
+  }
+}

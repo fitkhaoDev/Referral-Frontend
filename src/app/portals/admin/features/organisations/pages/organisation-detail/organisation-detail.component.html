@@ -1,0 +1,117 @@
+<section class="fk-page">
+  @if (loading() && !organisation()) {
+    <p class="muted">Loading organisation…</p>
+  } @else if (loadError()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load this organisation"
+      [message]="loadError()!.message"
+    >
+      <app-button variant="secondary" routerLink="/admin/organisations">Back</app-button>
+    </app-empty-state>
+  } @else if (organisation(); as o) {
+    <app-page-header [title]="o.name" [subtitle]="o.organisationTypeName + ' · ' + o.partnerId">
+      <div actions class="head-actions">
+        <app-button variant="ghost" routerLink="/admin/organisations">Back</app-button>
+        @if (!editing()) {
+          <app-button variant="secondary" (pressed)="startEdit()">Edit details</app-button>
+        }
+        <app-button variant="secondary" (pressed)="resetPassword()">Reset password</app-button>
+        <app-button
+          [variant]="o.status === 'ACTIVE' ? 'danger' : 'primary'"
+          (pressed)="toggleStatus()"
+        >
+          {{ o.status === 'ACTIVE' ? 'Deactivate' : 'Reactivate' }}
+        </app-button>
+      </div>
+    </app-page-header>
+
+    <div class="badges">
+      <app-status-badge
+        [label]="o.status === 'ACTIVE' ? 'Active' : 'Inactive'"
+        [tone]="o.status === 'ACTIVE' ? 'success' : 'neutral'"
+      ></app-status-badge>
+      <app-status-badge
+        [label]="passwordStateLabel(o.passwordState)"
+        [tone]="o.passwordState === 'MUST_CHANGE' ? 'warning' : 'info'"
+      ></app-status-badge>
+    </div>
+
+    @if (resetResult(); as rr) {
+      <app-alert tone="success" title="Temporary password generated">
+        @if (rr.delivery === 'ADMIN_DISPLAY' && rr.temporaryPassword) {
+          <p>Share this one-time password with the organisation securely. Shown once, not stored:</p>
+          <p class="temp-pass fk-num">{{ rr.temporaryPassword }}</p>
+        } @else {
+          <p>A temporary password has been sent to the organisation via {{ rr.delivery | lowercase }}.</p>
+        }
+        <app-button size="sm" variant="secondary" (pressed)="dismissResetResult()">Done</app-button>
+      </app-alert>
+    }
+
+    @if (editing()) {
+      <app-organisation-form
+        mode="edit"
+        [organisation]="o"
+        [typeOptions]="typeOptions()"
+        [saving]="saving()"
+        [saveError]="saveError()"
+        (save)="onSave($event)"
+        (cancel)="cancelEdit()"
+      ></app-organisation-form>
+    } @else {
+      <dl class="detail">
+        <div><dt>Partner ID</dt><dd class="fk-num">{{ o.partnerId }}</dd></div>
+        <div><dt>Referral code</dt><dd class="fk-num">{{ o.referralCode }}</dd></div>
+        <div><dt>Type</dt><dd>{{ o.organisationTypeName }}</dd></div>
+        <div><dt>Contact person</dt><dd>{{ o.contactPerson }}</dd></div>
+        <div><dt>Mobile</dt><dd>{{ o.mobile }}</dd></div>
+        <div><dt>Email</dt><dd>{{ o.email }}</dd></div>
+        <div class="detail__wide"><dt>Address</dt><dd>{{ o.address }}</dd></div>
+        <div><dt>Enrolled</dt><dd>{{ o.createdAt | date: 'mediumDate' }}</dd></div>
+        @if (o.deactivatedAt) {
+          <div><dt>Deactivated</dt><dd>{{ o.deactivatedAt | date: 'mediumDate' }}</dd></div>
+        }
+      </dl>
+
+      <div class="members">
+        <div class="members__head">
+          <h2>Members <span class="members__count fk-num">{{ o.memberCount }}</span></h2>
+          <a
+            class="members__manage"
+            [routerLink]="manageMembersLink()"
+            [queryParams]="manageMembersQuery()"
+          >
+            Manage members
+          </a>
+        </div>
+
+        @if (memberPreview(); as preview) {
+          @if (preview.items.length) {
+            <ul class="members__list">
+              @for (m of preview.items; track m.id) {
+                <li>
+                  <span class="members__name">{{ m.name }}</span>
+                  <span class="members__spec">{{ m.specialisation || '—' }}</span>
+                  <app-status-badge
+                    [label]="m.status === 'ACTIVE' ? 'Active' : 'Inactive'"
+                    [tone]="m.status === 'ACTIVE' ? 'success' : 'neutral'"
+                  ></app-status-badge>
+                </li>
+              }
+            </ul>
+            @if (o.memberCount > preview.items.length) {
+              <p class="members__more">
+                + {{ o.memberCount - preview.items.length }} more — use “Manage members”.
+              </p>
+            }
+          } @else {
+            <p class="muted">No members yet. Add doctors/accounts from “Manage members”.</p>
+          }
+        } @else {
+          <p class="muted">Loading members…</p>
+        }
+      </div>
+    }
+  }
+</section>

@@ -1,0 +1,131 @@
+/* Global reset + base element styling. Component-scoped styles live with components. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fk-font-sans);
+  font-size: var(--fk-text-base);
+  line-height: var(--fk-leading);
+  color: var(--fk-ink);
+  background: var(--fk-surface-muted);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure {
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--fk-text-2xl);
+  font-weight: var(--fk-weight-semibold);
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: var(--fk-text-xl);
+  font-weight: var(--fk-weight-semibold);
+}
+h3 {
+  font-size: var(--fk-text-lg);
+  font-weight: var(--fk-weight-semibold);
+}
+
+a {
+  color: var(--fk-green-strong);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* Visible focus for keyboard users everywhere. */
+:focus-visible {
+  outline: var(--fk-focus-outline);
+  outline-offset: 2px;
+  border-radius: var(--fk-radius-sm);
+}
+
+/* Screen-reader-only utility. */
+.fk-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* App-wide layout helpers used by portal shells. */
+.fk-page {
+  width: 100%;
+  max-width: var(--fk-content-max);
+  margin: 0 auto;
+  padding: var(--fk-space-6);
+}
+
+@media (max-width: 640px) {
+  .fk-page {
+    padding: var(--fk-space-4) var(--fk-space-4) var(--fk-space-12);
+  }
+}
+
+/* Tabular numerals for all monetary / metric figures. */
+.fk-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* CDK overlay z-index alignment with our token scale. */
+.cdk-overlay-container {
+  z-index: var(--fk-z-modal);
+}
+
+/* Dialog backdrop + panel. */
+.cdk-overlay-dark-backdrop {
+  background: rgba(27, 42, 30, 0.45);
+}
+.fk-dialog-panel {
+  max-width: 100vw;
+}
+.cdk-global-scrollblock {
+  overflow-y: hidden;
+}

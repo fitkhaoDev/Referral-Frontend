@@ -1,0 +1,108 @@
+:host {
+  display: inline-block;
+}
+:host(.is-block) {
+  display: block;
+}
+
+.btn {
+  --_bg: transparent;
+  --_fg: var(--fk-ink);
+  --_border: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fk-space-2);
+  font-weight: var(--fk-weight-semibold);
+  line-height: 1;
+  border: 1px solid var(--_border);
+  border-radius: var(--fk-radius-md);
+  background: var(--_bg);
+  color: var(--_fg);
+  transition: background var(--fk-transition-fast), border-color var(--fk-transition-fast),
+    color var(--fk-transition-fast), box-shadow var(--fk-transition-fast);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn:not(:disabled):hover {
+  box-shadow: var(--fk-shadow-xs);
+}
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--fk-focus-ring);
+}
+
+.btn--sm {
+  padding: 0.375rem 0.75rem;
+  font-size: var(--fk-text-sm);
+}
+.btn--md {
+  padding: 0.625rem 1rem;
+  font-size: var(--fk-text-base);
+}
+.btn--lg {
+  padding: 0.85rem 1.25rem;
+  font-size: var(--fk-text-md);
+  min-height: 48px;
+}
+.btn--block {
+  width: 100%;
+}
+
+.btn--primary {
+  --_bg: var(--fk-green);
+  --_fg: #fff;
+  --_border: var(--fk-green);
+}
+.btn--primary:not(:disabled):hover {
+  --_bg: var(--fk-green-strong);
+  --_border: var(--fk-green-strong);
+}
+
+.btn--secondary {
+  --_bg: var(--fk-white);
+  --_fg: var(--fk-ink);
+  --_border: var(--fk-border-strong);
+}
+.btn--secondary:not(:disabled):hover {
+  --_bg: var(--fk-surface-muted);
+}
+
+.btn--ghost {
+  --_bg: transparent;
+  --_fg: var(--fk-green-strong);
+}
+.btn--ghost:not(:disabled):hover {
+  --_bg: var(--fk-green-tint);
+}
+
+.btn--danger {
+  --_bg: var(--fk-danger);
+  --_fg: #fff;
+  --_border: var(--fk-danger);
+}
+.btn--danger:not(:disabled):hover {
+  filter: brightness(0.94);
+}
+
+.btn__spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn__spinner {
+    animation-duration: 1.4s;
+  }
+}

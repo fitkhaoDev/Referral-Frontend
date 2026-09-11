@@ -1,0 +1,117 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate class="pform">
+  @if (saveError() && !saveError()!.fieldErrors && saveError()!.status !== 422) {
+    <app-alert tone="error" title="Could not save">{{ saveError()!.message }}</app-alert>
+  }
+
+  <fieldset class="pform__section">
+    <legend>Identity</legend>
+    <div class="pform__grid">
+      <app-text-field
+        [control]="form.controls.name"
+        label="Full name"
+        autocomplete="name"
+        placeholder="e.g. Dr. John Doe"
+        requiredMark
+      ></app-text-field>
+      <app-select-field
+        [control]="form.controls.partnerTypeId"
+        label="Profession / partner type"
+        placeholder="Select a partner type"
+        [options]="partnerTypeOptions()"
+        requiredMark
+      ></app-select-field>
+      <app-text-field
+        [control]="form.controls.specialisation"
+        label="Specialisation"
+        placeholder="e.g. Cardiology (optional)"
+      ></app-text-field>
+    </div>
+  </fieldset>
+
+  <fieldset class="pform__section">
+    <legend>Contact</legend>
+    <div class="pform__grid">
+      <app-text-field
+        [control]="form.controls.mobile"
+        label="Mobile number"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        placeholder="+91 98765 43210"
+        [errors]="{ pattern: 'Enter a valid phone number.' }"
+        requiredMark
+      ></app-text-field>
+      <app-text-field
+        [control]="form.controls.email"
+        label="Email"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="partner@example.com"
+        requiredMark
+      ></app-text-field>
+    </div>
+    <label class="pform__field">
+      <span class="pform__label">Professional address</span>
+      <textarea
+        rows="2"
+        formControlName="professionalAddress"
+        placeholder="Clinic / practice address (optional)"
+      ></textarea>
+    </label>
+  </fieldset>
+
+  @if (mode() === 'create') {
+    <fieldset class="pform__section">
+      <legend>Account</legend>
+
+      <div class="pform__code">
+        <app-text-field
+          [control]="form.controls.referralCode"
+          label="Referral / coupon code"
+          placeholder="e.g. JOHNDOC10"
+          hint="Uppercase letters, numbers and hyphens. Cannot be changed later."
+          [errors]="{ pattern: '4–24 characters: A–Z, 0–9 and hyphens only.' }"
+          requiredMark
+        ></app-text-field>
+        <app-button type="button" variant="secondary" size="sm" (pressed)="suggestCode()">
+          Suggest
+        </app-button>
+      </div>
+
+      <div class="pform__grid">
+        <app-text-field
+          [control]="form.controls.initialPassword"
+          label="Temporary password"
+          type="password"
+          autocomplete="new-password"
+          hint="The partner must change this on first sign in. Min 8 chars, upper, lower and a number."
+          [errors]="{ weakPassword: 'Use a stronger password.' }"
+          requiredMark
+        ></app-text-field>
+        <app-text-field
+          [control]="form.controls.confirmPassword"
+          label="Confirm temporary password"
+          type="password"
+          autocomplete="new-password"
+          [errors]="{ mismatch: 'Passwords do not match.' }"
+          requiredMark
+        ></app-text-field>
+      </div>
+
+      <app-switch-field
+        [control]="form.controls.status"
+        label="Activate account now"
+        onText="Active"
+        offText="Inactive"
+      ></app-switch-field>
+    </fieldset>
+  }
+
+  <div class="pform__actions">
+    <app-button type="button" variant="secondary" (pressed)="onCancel()">Cancel</app-button>
+    <app-button type="submit" [loading]="saving()">
+      {{ mode() === 'create' ? 'Enrol partner' : 'Save changes' }}
+    </app-button>
+  </div>
+</form>

@@ -1,0 +1,111 @@
+<section class="fk-page">
+  @if (facade.detailLoading() && !facade.detail()) {
+    <p class="muted">Loading withdrawal…</p>
+  } @else if (facade.detailLoadError()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load this withdrawal"
+      [message]="facade.detailLoadError()!.message"
+    >
+      <app-button variant="secondary" routerLink="/admin/withdrawals">Back to withdrawals</app-button>
+    </app-empty-state>
+  } @else if (facade.detail(); as w) {
+    <app-page-header
+      [title]="w.reference"
+      [subtitle]="beneficiaryTypeLabelOf(w.beneficiaryType) + ' · requested ' + (w.requestedAt | date: 'medium')"
+    >
+      <div actions>
+        <app-button variant="ghost" routerLink="/admin/withdrawals">Back</app-button>
+      </div>
+    </app-page-header>
+
+    <div class="head">
+      <span class="head__amount fk-num">{{ w.amount | money }}</span>
+      <app-status-badge [label]="statusLabelOf(w.status)" [tone]="statusTone(w.status)"></app-status-badge>
+    </div>
+
+    @if (w.allowedActions.length) {
+      <div class="actions" role="group" aria-label="Withdrawal actions">
+        @for (action of w.allowedActions; track action) {
+          <app-button
+            [variant]="actionVariant(action)"
+            [loading]="facade.acting()"
+            (pressed)="runAction(action)"
+          >
+            {{ actionLabelOf(action) }}
+          </app-button>
+        }
+      </div>
+    } @else {
+      <p class="muted actions-none">No actions available — this withdrawal is {{ statusLabelOf(w.status) | lowercase }}.</p>
+    }
+
+    <section aria-label="Attribution">
+      <h2>Attribution</h2>
+      <dl class="detail">
+        <div><dt>Beneficiary</dt><dd>{{ beneficiaryName(w) }}</dd></div>
+        <div><dt>Beneficiary type</dt><dd>{{ beneficiaryTypeLabelOf(w.beneficiaryType) }}</dd></div>
+        @if (w.organisationName) {
+          <div><dt>Organisation</dt><dd>{{ w.organisationName }}</dd></div>
+        }
+        <div>
+          <dt>Wallet</dt>
+          <dd><a [routerLink]="['/admin/wallet', w.walletId]">View wallet ledger</a></dd>
+        </div>
+        @if (w.requesterNote) {
+          <div class="detail__wide"><dt>Requester note</dt><dd>{{ w.requesterNote }}</dd></div>
+        }
+      </dl>
+    </section>
+
+    <section aria-label="Payout">
+      <h2>Payout</h2>
+      <dl class="detail">
+        <div><dt>Method</dt><dd>{{ payoutMethodLabelOf(w.payoutMethod) }}</dd></div>
+        <div><dt>Destination</dt><dd class="fk-num">{{ w.payoutDestination }}</dd></div>
+        <div>
+          <dt>Available balance at request</dt>
+          <dd class="fk-num">{{ w.availableBalanceAtRequest | money }}</dd>
+        </div>
+      </dl>
+      <p class="note">
+        The amount, the balance shown and withdrawal eligibility are all decided by the backend at
+        request time. This screen never recomputes them.
+      </p>
+    </section>
+
+    <section aria-label="Lifecycle">
+      <h2>Lifecycle</h2>
+      <dl class="detail">
+        <div><dt>Requested</dt><dd>{{ w.requestedAt | date: 'medium' }}</dd></div>
+        @if (w.decidedAt) {
+          <div><dt>Decided</dt><dd>{{ w.decidedAt | date: 'medium' }}</dd></div>
+        }
+        @if (w.decidedBy) {
+          <div><dt>Decided by</dt><dd>{{ w.decidedBy }}</dd></div>
+        }
+        @if (w.rejectionReason) {
+          <div class="detail__wide"><dt>Rejection reason</dt><dd>{{ w.rejectionReason }}</dd></div>
+        }
+        @if (w.processingStartedAt) {
+          <div><dt>Processing started</dt><dd>{{ w.processingStartedAt | date: 'medium' }}</dd></div>
+        }
+        @if (w.paidAt) {
+          <div><dt>Paid</dt><dd>{{ w.paidAt | date: 'medium' }}</dd></div>
+        }
+        @if (w.paymentReference) {
+          <div><dt>Payment reference</dt><dd class="fk-num">{{ w.paymentReference }}</dd></div>
+        }
+        @if (w.failedAt) {
+          <div><dt>Failed</dt><dd>{{ w.failedAt | date: 'medium' }}</dd></div>
+        }
+        @if (w.failureReason) {
+          <div class="detail__wide"><dt>Failure reason</dt><dd>{{ w.failureReason }}</dd></div>
+        }
+        @if (w.cancelledAt) {
+          <div><dt>Cancelled by beneficiary</dt><dd>{{ w.cancelledAt | date: 'medium' }}</dd></div>
+        }
+      </dl>
+    </section>
+  }
+</section>

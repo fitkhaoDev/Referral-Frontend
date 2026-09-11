@@ -1,0 +1,102 @@
+<section class="fk-page">
+  <app-page-header
+    title="Partners"
+    subtitle="Individual referral partners enrolled by your team."
+    [count]="facade.page().totalItems"
+  >
+    <app-button actions (pressed)="enrol()">Enrol partner</app-button>
+  </app-page-header>
+
+  <app-filter-bar
+    class="toolbar"
+    searchPlaceholder="Search name, Partner ID, email, mobile or code…"
+    [searchTerm]="facade.search()"
+    [activeCount]="facade.activeFilterCount()"
+    (searchChange)="onSearch($event)"
+    (clearAll)="onClearFilters()"
+  >
+    <app-select-field
+      [control]="statusFilter"
+      label="Status"
+      placeholder="Any status"
+      [options]="statusOptions"
+    ></app-select-field>
+    <app-select-field
+      [control]="typeFilter"
+      label="Partner type"
+      placeholder="Any type"
+      [options]="typeOptions()"
+    ></app-select-field>
+    <app-select-field
+      [control]="passwordFilter"
+      label="Password"
+      placeholder="Any"
+      [options]="passwordOptions"
+    ></app-select-field>
+  </app-filter-bar>
+
+  @if (facade.listError() && !facade.loading()) {
+    <app-empty-state
+      tone="error"
+      title="Couldn’t load partners"
+      [message]="facade.listError()!.message"
+    >
+      <app-button variant="secondary" (pressed)="facade.reload()">Retry</app-button>
+    </app-empty-state>
+  } @else {
+    <app-data-table
+      [columns]="columns"
+      [rows]="facade.rows()"
+      [rowId]="rowId"
+      [sort]="facade.sort()"
+      [loading]="facade.loading()"
+      [pageSize]="facade.page().size"
+      clickableRows
+      caption="Partners"
+      emptyTitle="No partners match"
+      emptyMessage="Adjust your search or filters, or enrol a new partner."
+      (sortChange)="onSort($event)"
+      (rowActivate)="view($event)"
+    >
+      <ng-template appColumnCell="partnerId" let-row>
+        <code class="code">{{ row.partnerId }}</code>
+      </ng-template>
+      <ng-template appColumnCell="referralCode" let-row>
+        <code class="code">{{ row.referralCode }}</code>
+      </ng-template>
+      <ng-template appColumnCell="status" let-row>
+        <div class="status-cell">
+          <app-status-badge
+            [label]="statusLabel(row.status)"
+            [tone]="statusTone(row.status)"
+          ></app-status-badge>
+          @if (row.passwordState === 'MUST_CHANGE') {
+            <app-status-badge label="Temp password" tone="warning"></app-status-badge>
+          }
+        </div>
+      </ng-template>
+      <ng-template appColumnCell="actions" let-row>
+        <div class="row-actions">
+          <app-button variant="ghost" size="sm" (pressed)="view(row)">View</app-button>
+          <app-button
+            [variant]="row.status === 'ACTIVE' ? 'secondary' : 'primary'"
+            size="sm"
+            (pressed)="toggleStatus(row); $event.stopPropagation()"
+          >
+            {{ row.status === 'ACTIVE' ? 'Deactivate' : 'Reactivate' }}
+          </app-button>
+        </div>
+      </ng-template>
+    </app-data-table>
+
+    @if (facade.page().totalItems > 0) {
+      <app-pagination
+        [page]="facade.page().page"
+        [size]="facade.page().size"
+        [totalItems]="facade.page().totalItems"
+        [disabled]="facade.loading()"
+        (pageChange)="onPage($event)"
+      ></app-pagination>
+    }
+  }
+</section>

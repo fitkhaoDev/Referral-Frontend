@@ -1,0 +1,31 @@
+<div class="host" role="region" aria-label="Notifications">
+  @for (n of service.notifications(); track n.id) {
+    <div
+      class="toast"
+      [class]="'toast--' + n.tone"
+      [attr.role]="n.tone === 'error' ? 'alert' : 'status'"
+      [attr.aria-live]="n.tone === 'error' ? 'assertive' : 'polite'"
+    >
+      <span class="toast__icon" aria-hidden="true">{{ icon(n.tone) }}</span>
+      <div class="toast__body">
+        <p class="toast__title">{{ n.title }}</p>
+        @if (n.detail) {
+          <p class="toast__detail">{{ n.detail }}</p>
+        }
+        @if (n.action) {
+          <button type="button" class="toast__action" (click)="n.action.handler()">
+            {{ n.action.label }}
+          </button>
+        }
+      </div>
+      <button
+        type="button"
+        class="toast__close"
+        aria-label="Dismiss notification"
+        (click)="service.dismiss(n.id)"
+      >
+        &times;
+      </button>
+    </div>
+  }
+</div>

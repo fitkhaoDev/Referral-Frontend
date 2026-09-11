@@ -1,0 +1,81 @@
+<app-dialog-shell
+  [title]="referral.reference"
+  [subtitle]="referral.eventName + ' · ' + (referral.occurredAt | date: 'medium')"
+  (dismissed)="close()"
+>
+  <div class="rd">
+    <section class="rd__chain" aria-label="Attribution">
+      <h3>Attribution</h3>
+      <dl>
+        <div><dt>Customer</dt><dd class="fk-num">{{ referral.customerRef }}</dd></div>
+        <div><dt>Referral code</dt><dd class="fk-num">{{ referral.referralCode }}</dd></div>
+        @if (referral.partnerCategory === 'ORGANISATION') {
+          <div><dt>Organisation</dt><dd>{{ referral.organisationName }}</dd></div>
+          <div>
+            <dt>Referring doctor</dt>
+            <dd>{{ referral.referringMemberName || '—' }}</dd>
+          </div>
+        } @else {
+          <div><dt>Partner</dt><dd>{{ referral.partnerName }}</dd></div>
+        }
+      </dl>
+    </section>
+
+    <section class="rd__money" aria-label="Amounts">
+      <h3>Event &amp; amounts</h3>
+      <dl>
+        <div><dt>Event</dt><dd>{{ referral.eventName }}</dd></div>
+        @if (referral.plan) {
+          <div><dt>Plan</dt><dd>{{ referral.plan }}</dd></div>
+        }
+        @if (referral.planAmount) {
+          <div><dt>Plan amount</dt><dd class="fk-num">{{ referral.planAmount | money }}</dd></div>
+        }
+        @if (referral.customerDiscount) {
+          <div>
+            <dt>Customer discount</dt>
+            <dd class="fk-num">− {{ referral.customerDiscount | money }}</dd>
+          </div>
+        }
+        @if (referral.amountPayable) {
+          <div>
+            <dt>Amount payable</dt>
+            <dd class="fk-num">{{ referral.amountPayable | money }}</dd>
+          </div>
+        }
+        <div class="rd__commission">
+          <dt>Commission</dt>
+          <dd>
+            <span class="fk-num">{{
+              referral.commissionAmount ? (referral.commissionAmount | money) : '—'
+            }}</span>
+            <app-status-badge
+              [label]="commissionStatusLabel[referral.commissionStatus]"
+              [tone]="commissionTone(referral.commissionStatus)"
+            ></app-status-badge>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="rd__meta" aria-label="Reference">
+      <dl>
+        <div><dt>Occurred</dt><dd>{{ referral.occurredAt | date: 'medium' }}</dd></div>
+        @if (referral.transactionRef) {
+          <div>
+            <dt>Transaction reference</dt>
+            <dd class="fk-num">{{ referral.transactionRef }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+
+    <p class="rd__note">
+      Every monetary value and the commission status here are computed and set by the backend.
+    </p>
+  </div>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="close()">Close</app-button>
+  </div>
+</app-dialog-shell>
