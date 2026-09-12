@@ -29,7 +29,7 @@ function toParams(query: PageQuery): HttpParams {
 @Injectable()
 export class HttpPartnerApiService extends PartnerApi {
   private readonly http = inject(HttpClient);
-  private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/admin/partners`;
+  private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/adm/partners`;
 
   override list(query: PageQuery): Observable<Page<Partner>> {
     return this.http.get<Page<Partner>>(this.base, { params: toParams(query) });

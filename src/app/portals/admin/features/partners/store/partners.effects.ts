@@ -68,7 +68,7 @@ export class PartnersEffects {
   readonly setStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PartnerActions.setStatus),
-      exhaustMap(({ id, status }) =>
+      switchMap(({ id, status }) =>
         this.api.setStatus(id, status).pipe(
           map((partner) => PartnerActions.setStatusSuccess({ partner })),
           catchError((err) => of(PartnerActions.setStatusFailure({ error: toApiError(err) }))),
