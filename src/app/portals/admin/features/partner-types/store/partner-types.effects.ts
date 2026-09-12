@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { catchError, exhaustMap, map, merge, of, tap } from 'rxjs';
+import { catchError, exhaustMap, map, merge, of, switchMap, tap } from 'rxjs';
 import { isApiError } from '@core/models/api-error.util';
 import { ApiError } from '@core/models/api.model';
 import { NotificationService } from '@core/notifications/notification.service';
@@ -54,7 +54,7 @@ export class PartnerTypesEffects {
   readonly setStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PartnerTypeActions.setStatus),
-      exhaustMap(({ id, status }) =>
+      switchMap(({ id, status }) =>
         this.api.setStatus(id, status).pipe(
           map((partnerType) => PartnerTypeActions.setStatusSuccess({ partnerType })),
           catchError((err) => of(PartnerTypeActions.setStatusFailure({ error: toApiError(err) }))),

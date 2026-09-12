@@ -11,7 +11,8 @@ import { AppEnvironment } from './app-environment';
 export const environment: AppEnvironment = {
   production: false,
   useMockApi: true,
-  apiBaseUrl: 'http://localhost:8080/api',
+  apiBaseUrl: 'http://localhost:7071/api',
+  apiVersion: 'v1',
   mockLatencyMs: [180, 520],
   locale: 'en-IN',
   currency: 'INR',

@@ -9,7 +9,8 @@ import { AppEnvironment } from './app-environment';
 export const environment: AppEnvironment = {
   production: true,
   useMockApi: false,
-  apiBaseUrl: '/api',
+  apiBaseUrl: 'http://localhost:7071/api',
+  apiVersion: 'v1',
   mockLatencyMs: [0, 0],
   locale: 'en-IN',
   currency: 'INR',

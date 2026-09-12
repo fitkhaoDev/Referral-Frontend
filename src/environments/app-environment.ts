@@ -10,6 +10,7 @@ export interface AppEnvironment {
   readonly useMockApi: boolean;
   /** Base URL for all backend calls, no trailing slash. */
   readonly apiBaseUrl: string;
+  readonly apiVersion: string;
   /** Simulated latency range (ms) for the mock layer. Ignored when useMockApi is false. */
   readonly mockLatencyMs: readonly [number, number];
   /** Locale used for currency/date formatting across the app. */
