@@ -26,12 +26,12 @@ export class HttpPartnerTypeApiService extends PartnerTypeApi {
       return of(this.cachedItems);
     }
     return this.http
-      .get<Page<PartnerType>>(this.base, {
+      .get<{ data: Page<PartnerType> }>(this.base, {
         params: new HttpParams().set('page', '0').set('size', '1000'),
       })
       .pipe(
         map((res) => {
-          this.cachedItems = [...res.items];
+          this.cachedItems = [...res.data.items];
           return this.cachedItems;
         }),
       );
@@ -67,24 +67,26 @@ export class HttpPartnerTypeApiService extends PartnerTypeApi {
   }
 
   override get(id: Id): Observable<PartnerType> {
-    return this.http.get<PartnerType>(`${this.base}/${id}`);
+    return this.http
+      .get<{ data: PartnerType }>(`${this.base}/${id}`)
+      .pipe(map((res) => res.data));
   }
 
   override create(payload: CreatePartnerTypePayload): Observable<PartnerType> {
     return this.http
-      .post<PartnerType>(this.base, payload)
-      .pipe(tap(() => this.invalidate()));
+      .post<{ data: PartnerType }>(this.base, payload)
+      .pipe(tap(() => this.invalidate()), map((res) => res.data));
   }
 
   override update(id: Id, payload: UpdatePartnerTypePayload): Observable<PartnerType> {
     return this.http
-      .put<PartnerType>(`${this.base}/${id}`, payload)
-      .pipe(tap(() => this.invalidate()));
+      .put<{ data: PartnerType }>(`${this.base}/${id}`, payload)
+      .pipe(tap(() => this.invalidate()), map((res) => res.data));
   }
 
   override setStatus(id: Id, status: EntityStatus): Observable<PartnerType> {
     return this.http
-      .patch<PartnerType>(`${this.base}/${id}/status`, { status })
-      .pipe(tap(() => this.invalidate()));
+      .patch<{ data: PartnerType }>(`${this.base}/${id}/status`, { status })
+      .pipe(tap(() => this.invalidate()), map((res) => res.data));
   }
 }

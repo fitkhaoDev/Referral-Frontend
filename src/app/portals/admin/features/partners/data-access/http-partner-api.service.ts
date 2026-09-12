@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs';
 import { APP_CONFIG } from '@core/config/app-config.token';
 import { Id, Page, PageQuery } from '@core/models/api.model';
 import {
@@ -32,26 +33,38 @@ export class HttpPartnerApiService extends PartnerApi {
   private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/adm/partners`;
 
   override list(query: PageQuery): Observable<Page<Partner>> {
-    return this.http.get<Page<Partner>>(this.base, { params: toParams(query) });
+    return this.http
+      .get<{ data: Page<Partner> }>(this.base, { params: toParams(query) })
+      .pipe(map((res) => res.data));
   }
 
   override get(id: Id): Observable<Partner> {
-    return this.http.get<Partner>(`${this.base}/${id}`);
+    return this.http
+      .get<{ data: Partner }>(`${this.base}/${id}`)
+      .pipe(map((res) => res.data));
   }
 
   override create(payload: CreatePartnerPayload): Observable<Partner> {
-    return this.http.post<Partner>(this.base, payload);
+    return this.http
+      .post<{ data: Partner }>(this.base, payload)
+      .pipe(map((res) => res.data));
   }
 
   override update(id: Id, payload: UpdatePartnerPayload): Observable<Partner> {
-    return this.http.put<Partner>(`${this.base}/${id}`, payload);
+    return this.http
+      .put<{ data: Partner }>(`${this.base}/${id}`, payload)
+      .pipe(map((res) => res.data));
   }
 
   override setStatus(id: Id, status: PartnerAccountStatus): Observable<Partner> {
-    return this.http.patch<Partner>(`${this.base}/${id}/status`, { status });
+    return this.http
+      .patch<{ data: Partner }>(`${this.base}/${id}/status`, { status })
+      .pipe(map((res) => res.data));
   }
 
   override resetPassword(id: Id): Observable<PartnerPasswordResetResult> {
-    return this.http.post<PartnerPasswordResetResult>(`${this.base}/${id}/reset-password`, {});
+    return this.http
+      .post<{ data: PartnerPasswordResetResult }>(`${this.base}/${id}/reset-password`, {})
+      .pipe(map((res) => res.data));
   }
 }

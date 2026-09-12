@@ -1,9 +1,25 @@
 <app-auth-layout
-  eyebrow="Partner portal"
-  heading="Sign in to your FitKhao account"
-  subheading="Track referrals, incentives, your wallet and withdrawals."
-  tagline="Your referrals. Your earnings. In real time."
+  [eyebrow]="activeTab().label + ' portal'"
+  heading="Sign in to FitKhao"
+  [subheading]="selectedAudience() === 'partner'
+    ? 'Track referrals, incentives, your wallet and withdrawals.'
+    : 'Manage referral partners, incentive rules and commissions.'"
+  tagline="Referral Partner Management"
 >
+  <!-- Role selector tabs -->
+  <div class="role-tabs" role="tablist">
+    @for (tab of roleTabs; track tab.audience) {
+      <button
+        type="button"
+        role="tab"
+        class="role-tab"
+        [class.role-tab--active]="selectedAudience() === tab.audience"
+        [attr.aria-selected]="selectedAudience() === tab.audience"
+        (click)="selectAudience(tab.audience)"
+      >{{ tab.label }}</button>
+    }
+  </div>
+
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
     @if (error(); as err) {
       <app-alert tone="error" title="Sign in failed">{{ err.message }}</app-alert>
@@ -11,9 +27,9 @@
 
     <app-text-field
       [control]="form.controls.identifier"
-      label="Email or Partner ID"
+      [label]="activeTab().identifierLabel"
       autocomplete="username"
-      placeholder="you@example.com or FK-IND-000123"
+      [placeholder]="activeTab().identifierPlaceholder"
       requiredMark
     ></app-text-field>
 
@@ -27,9 +43,8 @@
 
     <app-button type="submit" size="lg" block [loading]="busy()">Sign in</app-button>
 
-    <p class="hint">
-      First time here? Use the temporary password from your FitKhao administrator — you’ll set your
-      own on first sign in.
-    </p>
+    @if (activeTab().hint) {
+      <p class="hint">{{ activeTab().hint }}</p>
+    }
   </form>
 </app-auth-layout>

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs';
 import { APP_CONFIG } from '../../config/app-config.token';
 import {
   Audience,
@@ -22,18 +23,24 @@ export class HttpAuthApiService extends AuthApi {
   }
 
   override login(audience: Audience, req: LoginRequest): Observable<AuthTokenResponse> {
-    return this.http.post<AuthTokenResponse>(this.url(audience, 'login'), req);
+    return this.http
+      .post<{ data: AuthTokenResponse }>(this.url(audience, 'login'), req)
+      .pipe(map((res) => res.data));
   }
 
   override refresh(audience: Audience, req: RefreshRequest): Observable<AuthTokenResponse> {
-    return this.http.post<AuthTokenResponse>(this.url(audience, 'refresh'), req);
+    return this.http
+      .post<{ data: AuthTokenResponse }>(this.url(audience, 'refresh'), req)
+      .pipe(map((res) => res.data));
   }
 
   override changePassword(
     audience: Audience,
     req: ChangePasswordRequest,
   ): Observable<AuthTokenResponse> {
-    return this.http.post<AuthTokenResponse>(this.url(audience, 'change-password'), req);
+    return this.http
+      .post<{ data: AuthTokenResponse }>(this.url(audience, 'change-password'), req)
+      .pipe(map((res) => res.data));
   }
 
   override logout(audience: Audience): Observable<void> {
@@ -41,6 +48,8 @@ export class HttpAuthApiService extends AuthApi {
   }
 
   override me(audience: Audience): Observable<AuthTokenResponse> {
-    return this.http.get<AuthTokenResponse>(this.url(audience, 'me'));
+    return this.http
+      .get<{ data: AuthTokenResponse }>(this.url(audience, 'me'))
+      .pipe(map((res) => res.data));
   }
 }

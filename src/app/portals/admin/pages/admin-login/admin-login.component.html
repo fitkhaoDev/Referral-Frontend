@@ -1,9 +1,25 @@
 <app-auth-layout
-  eyebrow="Admin portal"
-  heading="Sign in to FitKhao Admin"
-  subheading="Manage referral partners, incentive rules, commissions and withdrawals."
-  tagline="Referral Partner Management — Admin Console"
+  [eyebrow]="activeTab().label + ' portal'"
+  heading="Sign in to FitKhao"
+  [subheading]="selectedAudience() === 'admin'
+    ? 'Manage referral partners, incentive rules, commissions and withdrawals.'
+    : 'Track referrals, incentives, your wallet and withdrawals.'"
+  tagline="Referral Partner Management"
 >
+  <!-- Role selector tabs -->
+  <div class="role-tabs" role="tablist">
+    @for (tab of roleTabs; track tab.audience) {
+      <button
+        type="button"
+        role="tab"
+        class="role-tab"
+        [class.role-tab--active]="selectedAudience() === tab.audience"
+        [attr.aria-selected]="selectedAudience() === tab.audience"
+        (click)="selectAudience(tab.audience)"
+      >{{ tab.label }}</button>
+    }
+  </div>
+
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
     @if (error(); as err) {
       <app-alert tone="error" title="Sign in failed">{{ err.message }}</app-alert>
@@ -11,11 +27,9 @@
 
     <app-text-field
       [control]="form.controls.identifier"
-      label="Work email"
-      type="email"
+      [label]="activeTab().identifierLabel"
       autocomplete="username"
-      inputmode="email"
-      placeholder="you@fitkhao.com"
+      [placeholder]="activeTab().identifierPlaceholder"
       requiredMark
     ></app-text-field>
 
@@ -28,5 +42,9 @@
     ></app-text-field>
 
     <app-button type="submit" size="lg" block [loading]="busy()">Sign in</app-button>
+
+    @if (activeTab().hint) {
+      <p class="hint">{{ activeTab().hint }}</p>
+    }
   </form>
 </app-auth-layout>

@@ -202,7 +202,6 @@ export class MockAuthApiService extends AuthApi {
 
   private issue(account: MockAccount): AuthTokenResponse {
     const now = Date.now();
-    const expiresAt = new Date(now + 30 * 60_000).toISOString();
     const payload = btoa(
       JSON.stringify({
         sub: account.user.id,
@@ -211,14 +210,31 @@ export class MockAuthApiService extends AuthApi {
         exp: now + 1_800_000,
       }),
     );
-    return {
-      accessToken: `mock.${payload}.sig`,
-      refreshToken: `mock-refresh.${account.user.id}`,
-      tokenType: 'Bearer',
-      expiresAt,
-      user: account.user,
+    const base: AuthTokenResponse = {
+      token: `mock.${payload}.sig`,
+      role: account.user.roles[0] ?? '',
       mustChangePassword: account.mustChangePassword,
-      permissions: account.permissions,
+    };
+    if (account.audience === 'partner') {
+      return {
+        ...base,
+        partner: {
+          id: account.user.id,
+          name: account.user.displayName,
+          email: account.user.email,
+          partnerId: account.user.partnerId,
+          couponCode: account.user.referralCode,
+        },
+      };
+    }
+    return {
+      ...base,
+      admin: {
+        id: account.user.id,
+        name: account.user.displayName,
+        email: account.user.email,
+        permissions: account.permissions,
+      },
     };
   }
 }
