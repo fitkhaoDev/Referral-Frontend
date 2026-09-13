@@ -1,0 +1,1 @@
+import{Da as a,ha as i,zc as n}from"./chunk-A4MJ3TXE.js";var o=class e{inFlight=a(0);active=n(()=>this.inFlight()>0);begin(){this.inFlight.update(t=>t+1)}end(){this.inFlight.update(t=>Math.max(0,t-1))}static \u0275fac=function(d){return new(d||e)};static \u0275prov=i({token:e,factory:e.\u0275fac,providedIn:"root"})};export{o as a};

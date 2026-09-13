@@ -1,0 +1,1 @@
+import{d as i}from"./chunk-DMOM7TT2.js";import{K as t,v as o}from"./chunk-A4MJ3TXE.js";function p(n,m,r,e){return n.select(i(r)).pipe(t(1),o(u=>u?!0:m.createUrlTree([`/${r}/login`],{queryParams:e&&e!==`/${r}`?{returnUrl:e}:void 0})))}export{p as a};
