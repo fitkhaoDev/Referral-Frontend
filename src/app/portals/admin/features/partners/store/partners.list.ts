@@ -5,7 +5,7 @@ import { Partner } from '../models/partner.model';
 export const partnersList = createListFeature<Partner>({
   name: 'adminPartners',
   selectId: (partner) => partner.id,
-  initialSort: [{ field: 'name', direction: 'asc' }],
+  initialSort: [{ field: 'createdAt', direction: 'desc' }],
 });
 
 export const PARTNER_FILTER_KEYS = ['status', 'partnerTypeId', 'passwordState'] as const;

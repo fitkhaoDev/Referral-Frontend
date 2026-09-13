@@ -1,11 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { APP_CONFIG } from '@core/config/app-config.token';
 import { Id, Page, PageQuery } from '@core/models/api.model';
 import { EntityStatus } from '@core/models/common.model';
-import { paginate } from '@core/data-access/mock/mock-http.util';
 import {
   CreatePartnerTypePayload,
   PartnerType,
@@ -13,55 +12,36 @@ import {
 } from '../models/partner-type.model';
 import { PartnerTypeApi } from './partner-type-api.abstract';
 
-/** Real backend implementation of {@link PartnerTypeApi} with client-side pagination. */
+/** Real backend implementation of {@link PartnerTypeApi} using server-side pagination. */
 @Injectable()
 export class HttpPartnerTypeApiService extends PartnerTypeApi {
   private readonly http = inject(HttpClient);
   private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/adm/partner-types`;
 
-  private cachedItems: PartnerType[] | null = null;
-
-  private loadAll(): Observable<PartnerType[]> {
-    if (this.cachedItems !== null) {
-      return of(this.cachedItems);
-    }
-    return this.http
-      .get<{ data: Page<PartnerType> }>(this.base)
-      .pipe(
-        map((res) => {
-          this.cachedItems = [...res.data.items];
-          return this.cachedItems;
-        }),
-      );
-  }
-
-  private invalidate(): void {
-    this.cachedItems = null;
-  }
-
   override list(query: PageQuery): Observable<Page<PartnerType>> {
-    return this.loadAll().pipe(
-      map((items) =>
-        paginate(items, query, {
-          searchable: (r) => `${r.name} ${r.code}`,
-          filter: (r, f) => (f['status'] ? r.status === f['status'] : true),
-          comparator: (sort) => (a, b) => {
-            switch (sort.field) {
-              case 'code':
-                return a.code.localeCompare(b.code);
-              case 'partnerCount':
-                return a.partnerCount - b.partnerCount;
-              case 'status':
-                return a.status.localeCompare(b.status);
-              case 'createdAt':
-                return a.createdAt.localeCompare(b.createdAt);
-              default:
-                return a.name.localeCompare(b.name);
-            }
-          },
-        }),
-      ),
-    );
+    let params = new HttpParams();
+
+    if (query.size !== Number.MAX_SAFE_INTEGER) {
+      params = params.set('page', String(query.page)).set('size', String(query.size));
+    }
+
+    if (query.search) {
+      params = params.set('search', query.search);
+    }
+
+    for (const sort of query.sort ?? []) {
+      params = params.append('sort', `${sort.field},${sort.direction}`);
+    }
+
+    for (const [key, value] of Object.entries(query.filters ?? {})) {
+      if (value != null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    }
+
+    return this.http
+      .get<{ data: Page<PartnerType> }>(this.base, { params })
+      .pipe(map((res) => res.data));
   }
 
   override get(id: Id): Observable<PartnerType> {
@@ -73,18 +53,18 @@ export class HttpPartnerTypeApiService extends PartnerTypeApi {
   override create(payload: CreatePartnerTypePayload): Observable<PartnerType> {
     return this.http
       .post<{ data: PartnerType }>(this.base, payload)
-      .pipe(tap(() => this.invalidate()), map((res) => res.data));
+      .pipe(map((res) => res.data));
   }
 
   override update(id: Id, payload: UpdatePartnerTypePayload): Observable<PartnerType> {
     return this.http
       .put<{ data: PartnerType }>(`${this.base}/${id}`, payload)
-      .pipe(tap(() => this.invalidate()), map((res) => res.data));
+      .pipe(map((res) => res.data));
   }
 
   override setStatus(id: Id, status: EntityStatus): Observable<PartnerType> {
     return this.http
       .patch<{ data: PartnerType }>(`${this.base}/${id}/status`, { status })
-      .pipe(tap(() => this.invalidate()), map((res) => res.data));
+      .pipe(map((res) => res.data));
   }
 }

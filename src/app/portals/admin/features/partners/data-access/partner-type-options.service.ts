@@ -7,7 +7,7 @@ import { PartnerTypeApi } from '../../partner-types/data-access/partner-type-api
  * Active partner types as `<select>` options for the enrolment form and list filter.
  * Cached for the lifetime of the feature module.
  *
- * Contract: `GET /api/admin/partner-types?status=ACTIVE&size=200&sort=name,asc`.
+ * Contract: `GET /api/adm/partner-types?status=ACTIVE&sort=name,asc` — no size cap, returns all active types.
  */
 @Injectable()
 export class PartnerTypeOptionsService {
