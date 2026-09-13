@@ -10,7 +10,7 @@ export interface AuthUser {
   readonly id: Id;
   readonly displayName: string;
   readonly email: string;
-  /** Coarse roles for this audience (e.g. `['admin']`, `['referral_partner']`). */
+  /** Coarse roles for this audience (e.g. `['ADMIN']`, `['PARTNER']`). */
   readonly roles: readonly string[];
   /** Partner audience only: human-readable Partner ID (e.g. `FK-IND-000123`). */
   readonly partnerId?: string;
@@ -48,35 +48,15 @@ export interface LoginRequest {
   readonly password: string;
 }
 
-/** Backend login response — matches unifiedLogin.ts response shape. */
+/** Login/refresh response body. `audience` is implied by the endpoint that returned it. */
 export interface AuthTokenResponse {
-  readonly token: string;
-  readonly role: string;
-  readonly mustChangePassword?: boolean;
-  readonly partner?: {
-    readonly id: Id;
-    readonly accountId?: Id;
-    readonly profileId?: Id;
-    readonly name?: string;
-    readonly email?: string;
-    readonly partnerId?: string;
-    readonly couponCode?: string;
-    readonly passwordState?: string;
-  };
-  readonly admin?: {
-    readonly id: Id;
-    readonly accountId?: Id;
-    readonly profileId?: Id;
-    readonly employeeId?: string;
-    readonly name?: string;
-    readonly email?: string;
-    readonly permissions?: readonly string[];
-    readonly adminRole?: string;
-    readonly department?: string;
-    readonly designation?: string;
-    readonly profilePhoto?: string;
-    readonly isActive?: boolean;
-  };
+  readonly accessToken: string;
+  readonly refreshToken?: string;
+  readonly tokenType: 'Bearer';
+  readonly expiresAt: IsoDateTime;
+  readonly user: AuthUser;
+  readonly mustChangePassword: boolean;
+  readonly permissions: readonly string[];
 }
 
 export interface RefreshRequest {
@@ -89,21 +69,14 @@ export interface ChangePasswordRequest {
 }
 
 export function sessionFromToken(audience: Audience, res: AuthTokenResponse): AuthSession {
-  const profile = audience === 'partner' ? res.partner : res.admin;
   return {
     audience,
-    accessToken: res.token,
-    tokenType: 'Bearer',
-    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    user: {
-      id: String(profile?.id ?? ''),
-      displayName: profile?.name ?? '',
-      email: profile?.email ?? '',
-      roles: [res.role],
-      partnerId: res.partner?.partnerId,
-      referralCode: res.partner?.couponCode,
-    },
-    mustChangePassword: res.mustChangePassword ?? false,
-    permissions: res.admin?.permissions ?? [],
+    accessToken: res.accessToken,
+    refreshToken: res.refreshToken,
+    tokenType: res.tokenType,
+    expiresAt: res.expiresAt,
+    user: res.user,
+    mustChangePassword: res.mustChangePassword,
+    permissions: res.permissions ?? [],
   };
 }

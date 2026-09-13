@@ -40,7 +40,7 @@ export class PartnerFormComponent {
     name: ['', [Validators.required, Validators.maxLength(120)]],
     partnerTypeId: ['', [Validators.required]],
     specialisation: ['', [Validators.maxLength(80)]],
-    mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{7,20}$/)]],
+    mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{10}$/)]],
     email: ['', [Validators.required, Validators.email]],
     professionalAddress: ['', [Validators.maxLength(240)]],
     referralCode: ['', [Validators.pattern(/^[A-Z0-9-]{4,24}$/)]],

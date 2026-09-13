@@ -1,23 +1,24 @@
 <app-auth-layout
-  [eyebrow]="activeTab().label + ' portal'"
+  eyebrow="Admin portal"
   heading="Sign in to FitKhao"
-  [subheading]="selectedAudience() === 'admin'
-    ? 'Manage referral partners, incentive rules, commissions and withdrawals.'
-    : 'Track referrals, incentives, your wallet and withdrawals.'"
+  subheading="Manage referral partners, incentive rules, commissions and withdrawals."
   tagline="Referral Partner Management"
 >
   <!-- Role selector tabs -->
   <div class="role-tabs" role="tablist">
-    @for (tab of roleTabs; track tab.audience) {
-      <button
-        type="button"
-        role="tab"
-        class="role-tab"
-        [class.role-tab--active]="selectedAudience() === tab.audience"
-        [attr.aria-selected]="selectedAudience() === tab.audience"
-        (click)="selectAudience(tab.audience)"
-      >{{ tab.label }}</button>
-    }
+    <button
+      type="button"
+      role="tab"
+      class="role-tab role-tab--active"
+      aria-selected="true"
+    >Admin</button>
+    <button
+      type="button"
+      role="tab"
+      class="role-tab"
+      aria-selected="false"
+      (click)="goToPartner()"
+    >Partner</button>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
@@ -27,9 +28,9 @@
 
     <app-text-field
       [control]="form.controls.identifier"
-      [label]="activeTab().identifierLabel"
+      label="Work email"
       autocomplete="username"
-      [placeholder]="activeTab().identifierPlaceholder"
+      placeholder="you@fitkhao.com"
       requiredMark
     ></app-text-field>
 
@@ -42,9 +43,5 @@
     ></app-text-field>
 
     <app-button type="submit" size="lg" block [loading]="busy()">Sign in</app-button>
-
-    @if (activeTab().hint) {
-      <p class="hint">{{ activeTab().hint }}</p>
-    }
   </form>
 </app-auth-layout>

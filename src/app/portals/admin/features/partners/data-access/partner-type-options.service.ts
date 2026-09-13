@@ -16,7 +16,7 @@ export class PartnerTypeOptionsService {
   readonly options$: Observable<SelectOption[]> = this.api
     .list({
       page: 0,
-      size: 200,
+      size: Number.MAX_SAFE_INTEGER,
       sort: [{ field: 'name', direction: 'asc' }],
       search: '',
       filters: { status: 'ACTIVE' },

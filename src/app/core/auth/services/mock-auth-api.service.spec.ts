@@ -14,9 +14,9 @@ describe('MockAuthApiService', () => {
     const res = await firstValueFrom(
       api.login('admin', { identifier: 'admin@fitkhao.com', password: 'Admin@123' }),
     );
-    expect(res.token).toContain('mock.');
+    expect(res.accessToken).toContain('mock.');
     expect(res.mustChangePassword).toBe(false);
-    expect((res.admin?.permissions ?? []).length).toBeGreaterThan(0);
+    expect(res.permissions.length).toBeGreaterThan(0);
   });
 
   it('rejects wrong credentials with 401', async () => {
@@ -44,7 +44,7 @@ describe('MockAuthApiService', () => {
     const res = await firstValueFrom(
       api.login('partner', { identifier: 'FK-ORG-000007', password: 'Partner@123' }),
     );
-    expect(res.partner?.partnerId).toBe('FK-ORG-000007');
+    expect(res.user.partnerId).toBe('FK-ORG-000007');
   });
 
   it('clears mustChangePassword after a compliant password change', async () => {

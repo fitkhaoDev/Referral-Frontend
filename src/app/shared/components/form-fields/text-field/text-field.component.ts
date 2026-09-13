@@ -53,7 +53,7 @@ export class TextFieldComponent {
   protected readonly showError = computed(() => {
     this.controlEvents();
     const c = this.control();
-    return c.invalid && (c.touched || c.dirty);
+    return c.invalid && c.touched;
   });
 
   protected readonly errorText = computed(() => {

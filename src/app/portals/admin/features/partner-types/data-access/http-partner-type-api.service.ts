@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -26,9 +26,7 @@ export class HttpPartnerTypeApiService extends PartnerTypeApi {
       return of(this.cachedItems);
     }
     return this.http
-      .get<{ data: Page<PartnerType> }>(this.base, {
-        params: new HttpParams().set('page', '0').set('size', '1000'),
-      })
+      .get<{ data: Page<PartnerType> }>(this.base)
       .pipe(
         map((res) => {
           this.cachedItems = [...res.data.items];
