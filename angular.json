@@ -60,6 +60,7 @@
               ]
             },
             "ghpages": {
+              "baseHref": "/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

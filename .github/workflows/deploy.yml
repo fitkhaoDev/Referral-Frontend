@@ -26,7 +26,7 @@ jobs:
         run: npm install --force
 
       - name: Build
-        run: npx ng build --configuration production,ghpages --base-href /
+        run: npx ng build --configuration production,ghpages
 
       - name: Copy index.html to 404.html (SPA routing fix)
         run: cp dist/referral/browser/index.html dist/referral/browser/404.html
