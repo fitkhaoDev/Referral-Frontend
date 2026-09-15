@@ -5,7 +5,8 @@ import { Organisation } from '../models/organisation.model';
 export const organisationsList = createListFeature<Organisation>({
   name: 'adminOrganisations',
   selectId: (organisation) => organisation.id,
-  initialSort: [{ field: 'name', direction: 'asc' }],
+  initialPageSize: 10,
+  initialSort: [{ field: 'createdAt', direction: 'desc' }],
 });
 
 export const ORGANISATION_FILTER_KEYS = ['status', 'organisationTypeId', 'passwordState'] as const;

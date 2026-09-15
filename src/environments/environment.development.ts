@@ -11,7 +11,7 @@ import { AppEnvironment } from './app-environment';
 export const environment: AppEnvironment = {
   production: false,
   useMockApi: false,
-  apiBaseUrl: 'https://fitkhaodev-dtambvcxh2c2c7f3.centralindia-01.azurewebsites.net/api/',
+  apiBaseUrl: 'http://localhost:7071/api',
   apiVersion: 'v1',
   mockLatencyMs: [180, 520],
   locale: 'en-IN',

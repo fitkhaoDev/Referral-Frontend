@@ -41,7 +41,7 @@ export class OrganisationFormComponent {
     organisationTypeId: ['', [Validators.required]],
     referralCode: ['', [Validators.pattern(/^[A-Z0-9-]{4,32}$/)]],
     contactPerson: ['', [Validators.required, Validators.maxLength(120)]],
-    mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{7,20}$/)]],
+    mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{10}$/)]],
     email: ['', [Validators.required, Validators.email]],
     address: ['', [Validators.required, Validators.maxLength(280)]],
     status: [true],

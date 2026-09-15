@@ -6,6 +6,7 @@ export const organisationTypesList = createListFeature<OrganisationType>({
   name: 'adminOrganisationTypes',
   selectId: (type) => type.id,
   initialSort: [{ field: 'name', direction: 'asc' }],
+  initialPageSize: 10,
 });
 
 export const ORGANISATION_TYPE_FILTER_KEYS = ['status'] as const;
