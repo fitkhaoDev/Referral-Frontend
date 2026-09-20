@@ -6,6 +6,7 @@ export const incentiveRulesList = createListFeature<IncentiveRule>({
   name: 'adminIncentiveRules',
   selectId: (rule) => rule.id,
   initialSort: [{ field: 'name', direction: 'asc' }],
+  initialPageSize: 10,
 });
 
 export const INCENTIVE_RULE_FILTER_KEYS = ['scopeType', 'beneficiary', 'status'] as const;

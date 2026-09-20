@@ -1,6 +1,8 @@
 import { Dialog } from '@angular/cdk/dialog';
-import { ChangeDetectionStrategy, Component, LOCALE_ID, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, LOCALE_ID, computed, effect, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
+import { combineLatest, map } from 'rxjs';
 import { SortSpec } from '@core/models/api.model';
 import { ENTITY_STATUS_LABEL } from '@core/models/common.model';
 import { toMajorUnits } from '@core/models/money.model';
@@ -9,6 +11,7 @@ import { TableColumn } from '@shared/components/data-table/table-column.model';
 import { SelectOption } from '@shared/components/form-fields/select-field/select-field.component';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { connectListToUrl } from '@shared/store/connect-list-to-url';
+import { RuleScopeOptionsService } from '../../../../shared/rule-scope-options.service';
 import { IncentiveRuleFormDialogComponent } from '../../components/incentive-rule-form-dialog/incentive-rule-form-dialog.component';
 import {
   INCENTIVE_BENEFICIARY_LABEL,
@@ -35,6 +38,23 @@ export class IncentiveRuleListComponent {
   private readonly dialog = inject(Dialog);
   private readonly confirm = inject(ConfirmService);
   private readonly locale = inject(LOCALE_ID);
+  private readonly scopeOptions$ = inject(RuleScopeOptionsService);
+
+  // Map of scopeId → display label built from all three scope option streams
+  private readonly scopeNameMap = toSignal(
+    combineLatest([
+      this.scopeOptions$.partnerTypeOptions$,
+      this.scopeOptions$.organisationTypeOptions$,
+      this.scopeOptions$.organisationOptions$,
+    ]).pipe(
+      map(([pt, ot, org]) => {
+        const m = new Map<string, string>();
+        for (const o of [...pt, ...ot, ...org]) m.set(o.value as string, o.label);
+        return m;
+      }),
+    ),
+    { initialValue: new Map<string, string>() },
+  );
 
   protected readonly scopeFilter = new FormControl<string>('', { nonNullable: true });
   protected readonly beneficiaryFilter = new FormControl<string>('', { nonNullable: true });
@@ -51,18 +71,30 @@ export class IncentiveRuleListComponent {
     { value: 'INACTIVE', label: 'Inactive' },
   ];
 
-  protected readonly columns: TableColumn<IncentiveRule>[] = [
-    { key: 'name', header: 'Name', sortable: true, primary: true, value: (r) => r.name },
-    { key: 'scopeLabel', header: 'Applies to', primary: true, value: (r) => r.scopeLabel },
-    { key: 'beneficiary', header: 'Who earns', sortable: true },
-    { key: 'counselling', header: 'Counselling' },
-    { key: 'firstPurchase', header: 'First purchase' },
-    { key: 'renewal', header: 'Renewals' },
-    { key: 'effectiveFrom', header: 'Effective from', sortable: true, value: (r) => r.effectiveFrom },
-    { key: 'version', header: 'Version', align: 'end' },
-    { key: 'status', header: 'Status', sortable: true },
-    { key: 'actions', header: 'Actions', align: 'end' },
-  ];
+  protected readonly columns = computed<TableColumn<IncentiveRule>[]>(() => {
+    const nameMap = this.scopeNameMap();
+    return [
+      { key: 'name', header: 'Name', sortable: true, primary: true, value: (r) => r.name },
+      {
+        key: 'scopeLabel',
+        header: 'Applies to',
+        primary: true,
+        value: (r) => {
+          if (r.scopeType === 'GLOBAL') return RULE_SCOPE_TYPE_LABEL['GLOBAL'];
+          const label = r.scopeId ? (nameMap.get(r.scopeId) ?? r.scopeLabel) : r.scopeLabel;
+          return `${RULE_SCOPE_TYPE_LABEL[r.scopeType]} · ${label}`;
+        },
+      },
+      { key: 'beneficiary', header: 'Who earns', sortable: true },
+      { key: 'counselling', header: 'Counselling' },
+      { key: 'firstPurchase', header: 'First purchase' },
+      { key: 'renewal', header: 'Renewals' },
+      { key: 'effectiveFrom', header: 'Effective from', sortable: true, value: (r) => r.effectiveFrom },
+      { key: 'version', header: 'Version', align: 'end' },
+      { key: 'status', header: 'Status', sortable: true },
+      { key: 'actions', header: 'Actions', align: 'end' },
+    ];
+  });
 
   protected readonly rowId = (row: IncentiveRule): string => row.id;
 
@@ -168,7 +200,7 @@ export class IncentiveRuleListComponent {
   protected async toggleStatus(row: IncentiveRule): Promise<void> {
     const deactivating = row.status === 'ACTIVE';
     const ok = await this.confirm.confirm({
-      title: deactivating ? `Deactivate “${row.name}”?` : `Reactivate “${row.name}”?`,
+      title: deactivating ? `Deactivate "${row.name}"?` : `Reactivate "${row.name}"?`,
       message: deactivating
         ? 'New events in this scope will not generate incentives from this rule. Commissions already generated keep their snapshot and are unaffected.'
         : 'New events in this scope will generate incentives from this rule again.',

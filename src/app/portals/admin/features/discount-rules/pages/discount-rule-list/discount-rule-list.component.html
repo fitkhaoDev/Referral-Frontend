@@ -39,7 +39,7 @@
     </app-empty-state>
   } @else {
     <app-data-table
-      [columns]="columns"
+      [columns]="columns()"
       [rows]="facade.rows()"
       [rowId]="rowId"
       [sort]="facade.sort()"
