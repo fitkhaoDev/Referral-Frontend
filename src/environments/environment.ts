@@ -7,7 +7,7 @@ import { AppEnvironment } from './app-environment';
  * it never ships. When the real backend exists, only `apiBaseUrl` needs updating.
  */
 export const environment: AppEnvironment = {
-  production: true,
+  production: false,
   useMockApi: false,
   apiBaseUrl: 'http://localhost:7071/api',
   apiVersion: 'v1',

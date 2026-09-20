@@ -59,6 +59,11 @@
                 }
               ]
             },
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
             "ghpages": {
               "baseHref": "/",
               "fileReplacements": [
@@ -79,9 +84,12 @@
             },
             "development": {
               "buildTarget": "referral:build:development"
+            },
+            "local": {
+              "buildTarget": "referral:build:local"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "test": {
           "builder": "@angular/build:unit-test",
