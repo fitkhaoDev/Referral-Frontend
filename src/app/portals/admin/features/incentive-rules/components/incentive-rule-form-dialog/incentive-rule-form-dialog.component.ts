@@ -53,8 +53,8 @@ export class IncentiveRuleFormDialogComponent {
     { value: 'ORGANISATION_TYPE', label: 'An organisation type' },
     { value: 'ORGANISATION', label: 'A specific organisation' },
   ];
-  protected readonly beneficiaryOptions: SelectOption[] = (
-    ['PARTNER', 'ORGANISATION', 'DOCTOR'] as IncentiveBeneficiary[]
+  private readonly allBeneficiaryOptions: SelectOption[] = (
+    ['PARTNER', 'ORGANISATION', 'ORGANISATION + CONSULTER'] as IncentiveBeneficiary[]
   ).map((b) => ({ value: b, label: INCENTIVE_BENEFICIARY_LABEL[b] }));
 
   private readonly partnerTypeOpts = toSignal(this.scopeOptions.partnerTypeOptions$, {
@@ -73,6 +73,19 @@ export class IncentiveRuleFormDialogComponent {
     initialValue: this.form.controls.scopeType.value,
   });
 
+  protected readonly beneficiary = toSignal(this.form.controls.beneficiary.valueChanges, {
+    initialValue: this.form.controls.beneficiary.value,
+  });
+
+  protected readonly showConsulter = computed(() => this.beneficiary() === 'ORGANISATION + CONSULTER');
+
+  protected readonly beneficiaryOptions = computed<SelectOption[]>(() => {
+    const scope = this.scopeType();
+    if (scope === 'PARTNER_TYPE') return this.allBeneficiaryOptions.filter((o) => o.value === 'PARTNER');
+    if (scope === 'ORGANISATION_TYPE' || scope === 'ORGANISATION') return this.allBeneficiaryOptions.filter((o) => o.value !== 'PARTNER');
+    return this.allBeneficiaryOptions;
+  });
+
   protected readonly scopeIdOptions = computed<SelectOption[]>(() => {
     switch (this.scopeType()) {
       case 'PARTNER_TYPE':
@@ -87,6 +100,20 @@ export class IncentiveRuleFormDialogComponent {
   });
 
   constructor() {
+    effect(() => {
+      const scope = this.scopeType();
+      const ctrl = this.form.controls.beneficiary;
+      if (scope === 'PARTNER_TYPE') {
+        ctrl.setValue('PARTNER', { emitEvent: false });
+        ctrl.disable({ emitEvent: false });
+      } else {
+        ctrl.enable({ emitEvent: false });
+        if (scope === 'ORGANISATION_TYPE' || scope === 'ORGANISATION') {
+          if (ctrl.value === 'PARTNER') ctrl.setValue('ORGANISATION', { emitEvent: false });
+        }
+      }
+    });
+
     effect(() => {
       const needsScope = this.scopeType() !== 'GLOBAL';
       const control = this.form.controls.scopeId;
@@ -128,6 +155,12 @@ export class IncentiveRuleFormDialogComponent {
         rule?.firstPurchase ?? { kind: 'PERCENT', percent: 5 },
       ),
       renewal: makeRenewalGroup(this.fb, rule?.renewal),
+      consulterCounselling: makeIncentiveComponentGroup(this.fb, rule?.consulterCounselling),
+      consulterFirstPurchase: makeIncentiveComponentGroup(
+        this.fb,
+        rule?.consulterFirstPurchase ?? { kind: 'PERCENT', percent: 5 },
+      ),
+      consulterRenewal: makeRenewalGroup(this.fb, rule?.consulterRenewal),
       active: this.fb.control(rule ? rule.status === 'ACTIVE' : true),
       effectiveFrom: this.fb.control(
         rule?.effectiveFrom ?? new Date().toISOString().slice(0, 10),
@@ -152,6 +185,7 @@ export class IncentiveRuleFormDialogComponent {
       return;
     }
     const raw = this.form.getRawValue();
+    const withConsulter = raw.beneficiary === 'ORGANISATION + CONSULTER';
     const payload: CreateIncentiveRulePayload = {
       name: raw.name.trim(),
       scopeType: raw.scopeType,
@@ -160,6 +194,9 @@ export class IncentiveRuleFormDialogComponent {
       counselling: readIncentiveComponent(this.form.controls.counselling),
       firstPurchase: readIncentiveComponent(this.form.controls.firstPurchase),
       renewal: readRenewalIncentive(this.form.controls.renewal),
+      consulterCounselling: withConsulter ? readIncentiveComponent(this.form.controls.consulterCounselling) : undefined,
+      consulterFirstPurchase: withConsulter ? readIncentiveComponent(this.form.controls.consulterFirstPurchase) : undefined,
+      consulterRenewal: withConsulter ? readRenewalIncentive(this.form.controls.consulterRenewal) : undefined,
       status: (raw.active ? 'ACTIVE' : 'INACTIVE') as EntityStatus,
       effectiveFrom: raw.effectiveFrom,
     };

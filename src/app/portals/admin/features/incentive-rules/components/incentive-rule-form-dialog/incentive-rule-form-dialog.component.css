@@ -22,6 +22,14 @@
   color: var(--fk-faint);
   padding: 0 var(--fk-space-2);
 }
+.section-heading {
+  margin: 0;
+  font-size: var(--fk-text-xs);
+  font-weight: var(--fk-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fk-faint);
+}
 [footer] {
   display: flex;
   gap: var(--fk-space-3);

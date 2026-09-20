@@ -43,10 +43,14 @@
       <app-select-field
         [control]="form.controls.beneficiary"
         label="Who earns"
-        [options]="beneficiaryOptions"
+        [options]="beneficiaryOptions()"
         requiredMark
       ></app-select-field>
     </div>
+
+    @if (showConsulter()) {
+      <p class="section-heading">Organisation incentives</p>
+    }
 
     <fieldset class="section">
       <legend>Counselling completed</legend>
@@ -68,6 +72,31 @@
       <legend>Renewals</legend>
       <app-renewal-incentive-field [group]="form.controls.renewal"></app-renewal-incentive-field>
     </fieldset>
+
+    @if (showConsulter()) {
+      <p class="section-heading">Consulter incentives</p>
+
+      <fieldset class="section">
+        <legend>Counselling completed</legend>
+        <app-incentive-component-field
+          [group]="form.controls.consulterCounselling"
+          label="Consulter counselling incentive"
+        ></app-incentive-component-field>
+      </fieldset>
+
+      <fieldset class="section">
+        <legend>First qualifying purchase</legend>
+        <app-incentive-component-field
+          [group]="form.controls.consulterFirstPurchase"
+          label="Consulter first purchase incentive"
+        ></app-incentive-component-field>
+      </fieldset>
+
+      <fieldset class="section">
+        <legend>Renewals</legend>
+        <app-renewal-incentive-field [group]="form.controls.consulterRenewal"></app-renewal-incentive-field>
+      </fieldset>
+    }
 
     <div class="grid">
       <app-date-field

@@ -102,7 +102,7 @@ const SEED: Seed[] = [
     scopeType: 'ORGANISATION',
     scopeId: 'org-000001',
     scopeLabel: 'Apollo Hospital — Dum Dum',
-    beneficiary: 'DOCTOR',
+    beneficiary: 'ORGANISATION',
     counselling: fix(100),
     firstPurchase: pct(5),
     renewal: { kind: 'PERCENT_INDEFINITE', percent: 3 },

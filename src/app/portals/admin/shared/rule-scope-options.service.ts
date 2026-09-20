@@ -20,7 +20,7 @@ export class RuleScopeOptionsService {
   readonly partnerTypeOptions$: Observable<SelectOption[]> = this.partnerTypes
     .list({
       page: 0,
-      size: 200,
+      size: Number.MAX_SAFE_INTEGER,
       sort: [{ field: 'name', direction: 'asc' }],
       search: '',
       filters: { status: 'ACTIVE' },
@@ -33,7 +33,7 @@ export class RuleScopeOptionsService {
   readonly organisationTypeOptions$: Observable<SelectOption[]> = this.organisationTypes
     .list({
       page: 0,
-      size: 200,
+      size: Number.MAX_SAFE_INTEGER,
       sort: [{ field: 'name', direction: 'asc' }],
       search: '',
       filters: { status: 'ACTIVE' },
@@ -46,7 +46,7 @@ export class RuleScopeOptionsService {
   readonly organisationOptions$: Observable<SelectOption[]> = this.organisations
     .list({
       page: 0,
-      size: 500,
+      size: Number.MAX_SAFE_INTEGER,
       sort: [{ field: 'name', direction: 'asc' }],
       search: '',
       filters: { status: 'ACTIVE' },

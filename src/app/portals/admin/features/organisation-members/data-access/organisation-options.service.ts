@@ -6,7 +6,7 @@ import { OrganisationApi } from '../../organisations/data-access/organisation-ap
 /**
  * Active organisations as `<select>` options for the member form + list filter.
  *
- * Contract: `GET /api/admin/organisations?status=ACTIVE&size=500&sort=name,asc`.
+ * Contract: `GET /api/adm/organisations?status=ACTIVE&sort=name,asc` (no page/size — fetch all).
  */
 @Injectable()
 export class OrganisationOptionsService {
@@ -15,7 +15,7 @@ export class OrganisationOptionsService {
   readonly options$: Observable<SelectOption[]> = this.api
     .list({
       page: 0,
-      size: 500,
+      size: Number.MAX_SAFE_INTEGER,
       sort: [{ field: 'name', direction: 'asc' }],
       search: '',
       filters: { status: 'ACTIVE' },

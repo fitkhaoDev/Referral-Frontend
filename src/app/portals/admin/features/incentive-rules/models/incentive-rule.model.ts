@@ -4,12 +4,12 @@ import { Money } from '@core/models/money.model';
 import { RuleScopeType } from '@core/models/rule-scope.model';
 
 /** Who earns the incentive. Organisation and doctor incentives are INDEPENDENT rules. */
-export type IncentiveBeneficiary = 'PARTNER' | 'ORGANISATION' | 'DOCTOR';
+export type IncentiveBeneficiary = 'PARTNER' | 'ORGANISATION' | 'ORGANISATION + CONSULTER';
 
 export const INCENTIVE_BENEFICIARY_LABEL: Record<IncentiveBeneficiary, string> = {
-  PARTNER: 'Individual partner',
-  ORGANISATION: 'Organisation',
-  DOCTOR: 'Referring doctor',
+  'PARTNER': 'Individual partner',
+  'ORGANISATION': 'Organisation',
+  'ORGANISATION + CONSULTER': 'Organisation with Consulter',
 };
 
 export type IncentiveComponentKind = 'NONE' | 'PERCENT' | 'FIXED';
@@ -71,6 +71,10 @@ export interface IncentiveRule {
   readonly counselling: IncentiveComponent;
   readonly firstPurchase: IncentiveComponent;
   readonly renewal: RenewalIncentive;
+  /** Present only when beneficiary is ORGANISATION + CONSULTER. */
+  readonly consulterCounselling?: IncentiveComponent;
+  readonly consulterFirstPurchase?: IncentiveComponent;
+  readonly consulterRenewal?: RenewalIncentive;
   readonly status: EntityStatus;
   readonly effectiveFrom: IsoDate;
   /** Read-only. Bumped by the backend on every change; commission snapshots reference it. */
@@ -87,6 +91,10 @@ export interface CreateIncentiveRulePayload {
   readonly counselling: IncentiveComponent;
   readonly firstPurchase: IncentiveComponent;
   readonly renewal: RenewalIncentive;
+  /** Present only when beneficiary is ORGANISATION + CONSULTER. */
+  readonly consulterCounselling?: IncentiveComponent;
+  readonly consulterFirstPurchase?: IncentiveComponent;
+  readonly consulterRenewal?: RenewalIncentive;
   readonly status: EntityStatus;
   readonly effectiveFrom: IsoDate;
 }

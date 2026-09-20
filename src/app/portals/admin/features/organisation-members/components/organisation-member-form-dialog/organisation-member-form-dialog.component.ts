@@ -47,7 +47,7 @@ export class OrganisationMemberFormDialogComponent {
     ],
     name: ['', [Validators.required, Validators.maxLength(120)]],
     specialisation: ['', [Validators.maxLength(80)]],
-    mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{7,20}$/)]],
+    mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{10}$/)]],
     email: ['', [Validators.required, Validators.email]],
     active: [true],
   });
