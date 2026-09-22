@@ -5,6 +5,7 @@ import { WalletSummary } from '../models/wallet.model';
 export const walletsList = createListFeature<WalletSummary>({
   name: 'adminWallets',
   selectId: (wallet) => wallet.id,
+  initialPageSize: 10,
   initialSort: [{ field: 'ownerName', direction: 'asc' }],
 });
 

@@ -5,6 +5,7 @@ import { Commission } from '../models/commission.model';
 export const commissionsList = createListFeature<Commission>({
   name: 'adminCommissions',
   selectId: (commission) => commission.id,
+  initialPageSize: 10,
   initialSort: [{ field: 'occurredAt', direction: 'desc' }],
 });
 

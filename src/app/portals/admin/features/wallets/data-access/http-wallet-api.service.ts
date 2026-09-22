@@ -1,16 +1,21 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { APP_CONFIG } from '@core/config/app-config.token';
 import { Id, Page, PageQuery } from '@core/models/api.model';
 import { WalletSummary, WalletTransaction } from '../models/wallet.model';
 import { WalletApi } from './wallet-api.abstract';
 
 function toParams(query: PageQuery): HttpParams {
-  let params = new HttpParams().set('page', String(query.page)).set('size', String(query.size));
+  let params = new HttpParams();
+  if (query.size !== Number.MAX_SAFE_INTEGER) {
+    params = params.set('page', String(query.page)).set('size', String(query.size));
+  }
   if (query.search) params = params.set('search', query.search);
-  const sort = query.sort?.[0];
-  if (sort) params = params.set('sort', `${sort.field},${sort.direction}`);
+  for (const sort of query.sort ?? []) {
+    params = params.append('sort', `${sort.field},${sort.direction}`);
+  }
   for (const [key, value] of Object.entries(query.filters ?? {})) {
     if (key === 'walletId') continue; // carried in the path, not the query string
     if (value !== null && value !== undefined && value !== '') {
@@ -24,19 +29,19 @@ function toParams(query: PageQuery): HttpParams {
 @Injectable()
 export class HttpWalletApiService extends WalletApi {
   private readonly http = inject(HttpClient);
-  private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/admin/wallets`;
+  private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/adm/wallets`;
 
   override listWallets(query: PageQuery): Observable<Page<WalletSummary>> {
-    return this.http.get<Page<WalletSummary>>(this.base, { params: toParams(query) });
+    return this.http.get<any>(this.base, { params: toParams(query) }).pipe(map((res) => res.data));
   }
 
   override getWallet(id: Id): Observable<WalletSummary> {
-    return this.http.get<WalletSummary>(`${this.base}/${id}`);
+    return this.http.get<any>(`${this.base}/${id}`).pipe(map((res) => res.data));
   }
 
   override listTransactions(walletId: Id, query: PageQuery): Observable<Page<WalletTransaction>> {
-    return this.http.get<Page<WalletTransaction>>(`${this.base}/${walletId}/transactions`, {
-      params: toParams(query),
-    });
+    return this.http
+      .get<any>(`${this.base}/${walletId}/transactions`, { params: toParams(query) })
+      .pipe(map((res) => res.data));
   }
 }
