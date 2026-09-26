@@ -28,10 +28,11 @@
 
     <app-text-field
       [control]="form.controls.identifier"
-      label="Work email"
+      label="Email, mobile or user ID"
       autocomplete="username"
-      placeholder="you@fitkhao.com"
+      placeholder="you@fitkhao.com, 98xxxxxxxx or your user ID"
       requiredMark
+      [errors]="{ identifier: 'Enter a valid email, 10-digit mobile number or user ID.' }"
     ></app-text-field>
 
     <app-text-field

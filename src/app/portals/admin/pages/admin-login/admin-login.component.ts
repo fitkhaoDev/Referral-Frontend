@@ -1,7 +1,19 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
 import { AuthFacadeService } from '@core/auth/services/auth-facade.service';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MOBILE_RE = /^[6-9]\d{9}$/;
+const USER_ID_RE = /^[a-zA-Z0-9._-]{3,}$/;
+
+function emailMobileOrUserId(control: AbstractControl): ValidationErrors | null {
+  const raw = String(control.value ?? '').trim();
+  if (!raw) return null;
+  return EMAIL_RE.test(raw) || MOBILE_RE.test(raw) || USER_ID_RE.test(raw)
+    ? null
+    : { identifier: true };
+}
 
 @Component({
   selector: 'app-admin-login',
@@ -19,7 +31,7 @@ export class AdminLoginComponent {
   protected readonly error = this.auth.error('admin');
 
   protected readonly form = this.fb.nonNullable.group({
-    identifier: ['', [Validators.required]],
+    identifier: ['', [Validators.required, emailMobileOrUserId]],
     password: ['', [Validators.required]],
   });
 
