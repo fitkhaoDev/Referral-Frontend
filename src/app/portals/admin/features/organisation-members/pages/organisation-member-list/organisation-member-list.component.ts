@@ -62,6 +62,13 @@ export class OrganisationMemberListComponent {
   constructor() {
     connectListToUrl(organisationMembersList, { filterKeys: ORGANISATION_MEMBER_FILTER_KEYS });
 
+    // Default the list to ACTIVE members on first load. URL / user selection
+    // (including "Any status") takes precedence — we only seed the filter when
+    // nothing has been chosen yet.
+    if (!this.facade.filters().status) {
+      this.facade.setFilters({ status: 'ACTIVE' });
+    }
+
     effect(() => {
       const f = this.facade.filters();
       this.sync(this.orgFilter, f.organisationId ?? '');

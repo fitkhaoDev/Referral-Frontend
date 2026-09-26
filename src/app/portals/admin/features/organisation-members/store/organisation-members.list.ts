@@ -5,6 +5,7 @@ import { OrganisationMember } from '../models/organisation-member.model';
 export const organisationMembersList = createListFeature<OrganisationMember>({
   name: 'adminOrganisationMembers',
   selectId: (member) => member.id,
+  initialPageSize: 10,
   initialSort: [{ field: 'name', direction: 'asc' }],
 });
 
