@@ -30,9 +30,22 @@ export class PartnerChangePasswordComponent {
 
     effect(() => {
       const err = this.error();
-      const fieldMsg = err?.fieldErrors?.['newPassword']?.[0];
-      if (fieldMsg) {
-        this.form.controls.newPassword.setErrors({ server: fieldMsg });
+      if (!err) return;
+
+      const currentPasswordFieldMsg = err.fieldErrors?.['currentPassword']?.[0];
+      const looksLikeWrongCurrent =
+        err.status === 401 ||
+        err.code === 'INVALID_CURRENT_PASSWORD' ||
+        /current.*password/i.test(err.message ?? '');
+      if (currentPasswordFieldMsg || looksLikeWrongCurrent) {
+        this.form.controls.currentPassword.setErrors({
+          server: currentPasswordFieldMsg ?? 'Current password is incorrect.',
+        });
+      }
+
+      const newPasswordFieldMsg = err.fieldErrors?.['newPassword']?.[0];
+      if (newPasswordFieldMsg) {
+        this.form.controls.newPassword.setErrors({ server: newPasswordFieldMsg });
       }
     });
 
@@ -51,6 +64,12 @@ export class PartnerChangePasswordComponent {
   protected genericError(): string | null {
     const err = this.error();
     if (!err || err.status === 422) return null;
+    // Wrong current-password errors are shown inline on the field, so skip the banner.
+    const looksLikeWrongCurrent =
+      err.status === 401 ||
+      err.code === 'INVALID_CURRENT_PASSWORD' ||
+      /current.*password/i.test(err.message ?? '');
+    if (looksLikeWrongCurrent) return null;
     return err.message;
   }
 
