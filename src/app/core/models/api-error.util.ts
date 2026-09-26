@@ -37,6 +37,8 @@ export function fromHttpError(err: HttpErrorResponse, correlationId?: string): A
         message?: string;
         errors?: Record<string, string[]>;
         fieldErrors?: Record<string, string[]>;
+        /** ResponseBuilder shape: { error: { code, details } } */
+        error?: { code?: string; details?: any };
       }
     | string
     | null;
@@ -46,10 +48,17 @@ export function fromHttpError(err: HttpErrorResponse, correlationId?: string): A
   let fieldErrors: Record<string, string[]> | undefined;
 
   if (body && typeof body === 'object') {
+    // Accept both flat `{ code }` and ResponseBuilder's `{ error: { code } }` shapes.
     if (body.code) code = body.code;
+    else if (body.error?.code) code = body.error.code;
     // Only trust the backend message for client-error statuses; hide 5xx internals.
     if (body.message && status >= 400 && status < 500) message = body.message;
-    fieldErrors = body.fieldErrors ?? body.errors;
+    // ResponseBuilder passes validation field errors through `error.details`.
+    const detailErrors =
+      body.error?.details && typeof body.error.details === 'object' && !Array.isArray(body.error.details)
+        ? (body.error.details as Record<string, string[]>)
+        : undefined;
+    fieldErrors = body.fieldErrors ?? body.errors ?? detailErrors;
   }
 
   return { status, code, message, fieldErrors, correlationId, raw: err.error };

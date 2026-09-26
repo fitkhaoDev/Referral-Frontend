@@ -45,7 +45,10 @@ export class HttpAuthApiService extends AuthApi {
   private readonly base = inject(APP_CONFIG).apiBaseUrl;
 
   private url(audience: Audience, path: string): string {
-    return `${this.base}/${audience}/auth/${path}`;
+    // Backend uses the shortened `adm` prefix for admin routes; other audiences
+    // map 1:1 to their audience name.
+    const audiencePath = audience === 'admin' ? 'adm' : audience;
+    return `${this.base}/${audiencePath}/auth/${path}`;
   }
 
   /** Maps the unified-login wire format to the frontend {@link AuthTokenResponse} shape. */

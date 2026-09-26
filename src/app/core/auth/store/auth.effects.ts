@@ -79,15 +79,15 @@ export class AuthEffects {
     ),
   );
 
+  /**
+   * Sign-out is purely client-side: no backend call. We simply dispatch
+   * sessionCleared, which drops the tokens from storage and redirects to
+   * the login screen.
+   */
   readonly logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),
-      exhaustMap(({ audience, reason }) =>
-        this.api.logout(audience).pipe(
-          catchError(() => of(void 0)),
-          map(() => AuthActions.sessionCleared({ audience, reason })),
-        ),
-      ),
+      map(({ audience, reason }) => AuthActions.sessionCleared({ audience, reason })),
     ),
   );
 
