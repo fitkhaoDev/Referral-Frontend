@@ -53,6 +53,12 @@ export interface WalletTransaction {
   readonly amount: Money;
   readonly status: WalletTransactionStatus;
   readonly customerRef?: string;
+  readonly customerId?: Id;
+  readonly customerName?: string;
+  readonly subscriptionId?: Id;
+  readonly subscriptionRef?: string;
+  readonly subscriptionPlanName?: string;
+  readonly subscriptionAmount?: Money;
   readonly organisationName?: string;
   readonly memberName?: string;
   readonly eventName?: string;

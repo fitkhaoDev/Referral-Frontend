@@ -50,16 +50,6 @@
       <ng-template appColumnCell="available" let-row>
         <span class="fk-num">{{ row.available | money }}</span>
       </ng-template>
-      <ng-template appColumnCell="pending" let-row>
-        <span class="fk-num muted">{{ row.pending | money }}</span>
-      </ng-template>
-      <ng-template appColumnCell="outstandingRecovery" let-row>
-        @if (row.outstandingRecovery.minorUnits > 0) {
-          <span class="fk-num recovery">{{ row.outstandingRecovery | money }}</span>
-        } @else {
-          <span class="muted">—</span>
-        }
-      </ng-template>
       <ng-template appColumnCell="lastActivityAt" let-row>
         <span class="when">
           <span>{{ row.lastActivityAt | date: 'mediumDate' }}</span>

@@ -12,6 +12,11 @@
   box-shadow: var(--fk-shadow-lg);
   overflow: hidden;
 }
+/* Wide variant — fills whatever width the CDK panel gives it (up to 100%). */
+.dlg--wide {
+  width: 100%;
+  max-height: 90vh;
+}
 
 .dlg__head {
   display: flex;

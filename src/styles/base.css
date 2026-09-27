@@ -125,6 +125,13 @@ svg {
 }
 .fk-dialog-panel {
   max-width: 100vw;
+  /* CDK's global-overlay-wrapper is a flex container; auto margins center the pane. */
+  margin: auto;
+}
+/* Ensure the CDK overlay wrapper actually flexes so the pane centers. */
+.cdk-global-overlay-wrapper {
+  justify-content: center;
+  align-items: center;
 }
 .cdk-global-scrollblock {
   overflow-y: hidden;

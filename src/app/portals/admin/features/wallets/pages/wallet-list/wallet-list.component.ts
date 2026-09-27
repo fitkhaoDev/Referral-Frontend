@@ -34,8 +34,6 @@ export class WalletListComponent {
     { key: 'ownerType', header: 'Type', primary: true, value: (r) => WALLET_OWNER_TYPE_LABEL[r.ownerType] },
     { key: 'ownerRef', header: 'Reference', hideOnMobile: true, value: (r) => r.ownerRef },
     { key: 'available', header: 'Available', sortable: true, align: 'end' },
-    { key: 'pending', header: 'Pending', sortable: true, align: 'end' },
-    { key: 'outstandingRecovery', header: 'Recovery due', align: 'end' },
     { key: 'lastActivityAt', header: 'Last activity', sortable: true },
   ];
 
