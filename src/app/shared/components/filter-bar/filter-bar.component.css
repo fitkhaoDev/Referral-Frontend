@@ -4,7 +4,7 @@
 
 .fbar {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--fk-space-3);
   flex-wrap: wrap;
 }
@@ -78,7 +78,7 @@
 }
 .fbar__filters {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--fk-space-3);
   flex-wrap: wrap;
 }
@@ -88,7 +88,7 @@
 }
 .fbar__controls {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--fk-space-3);
   flex-wrap: wrap;
 }

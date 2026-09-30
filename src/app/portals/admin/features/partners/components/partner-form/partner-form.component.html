@@ -85,8 +85,8 @@
           label="Temporary password"
           type="password"
           autocomplete="new-password"
-          hint="The partner must change this on first sign in. Min 8 chars, upper, lower and a number."
-          [errors]="{ weakPassword: 'Use a stronger password.' }"
+          hint="The partner must change this on first sign in. Min 8 chars with an uppercase, a lowercase, a number and a special symbol (! @ # $ % ^ & * _ - + = ?)."
+          [errors]="{ weakPassword: 'Password needs: ' + weakHint() + '.' }"
           requiredMark
         ></app-text-field>
         <app-text-field

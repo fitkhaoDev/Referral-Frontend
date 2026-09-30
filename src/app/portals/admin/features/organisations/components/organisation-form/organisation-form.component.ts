@@ -107,6 +107,11 @@ export class OrganisationFormComponent {
       .subscribe(() => this.form.controls.confirmPassword.updateValueAndValidity());
   }
 
+  protected weakHint(): string {
+    const failed = this.form.controls.initialPassword.errors?.['weakPassword'] as string[] | undefined;
+    return failed?.join(', ') ?? 'a stronger password';
+  }
+
   protected suggestCode(): void {
     const base = this.form.controls.name
       .value.replace(/[^a-z0-9]+/gi, '-')
