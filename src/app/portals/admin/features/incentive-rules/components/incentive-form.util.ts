@@ -1,11 +1,29 @@
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { money, toMajorUnits } from '@core/models/money.model';
+import { Money } from '@core/models/money.model';
 import {
   IncentiveComponent,
   IncentiveComponentKind,
   RenewalIncentive,
   RenewalIncentiveKind,
 } from '../models/incentive-rule.model';
+
+/**
+ * Wire contract for IncentiveRule money is `{ amount: <rupees>, currency }` (NOT the
+ * shared `{ minorUnits, currency }` shape). These helpers bridge the form's string
+ * rupee input to that shape and back — using the shared `money()` helper here
+ * silently produces `minorUnits` which the backend rejects.
+ */
+function moneyFromRupees(rupees: number): Money {
+  return { amount: Number(rupees), currency: 'INR' } as unknown as Money;
+}
+function rupeesFromMoney(m: Money | undefined): number {
+  if (!m) return 0;
+  // Backend sends rupees on `amount`; older callers may have sent minorUnits.
+  const raw = (m as any).amount;
+  if (typeof raw === 'number') return raw;
+  if (typeof m.minorUnits === 'number') return m.minorUnits / 100;
+  return 0;
+}
 
 /** Reactive group for one {@link IncentiveComponent} (kind + percent + rupee amount as string). */
 export type IncentiveComponentGroup = FormGroup<{
@@ -29,14 +47,14 @@ export function makeIncentiveComponentGroup(
   return fb.group({
     kind: fb.control<IncentiveComponentKind>(value?.kind ?? 'NONE'),
     percent: fb.control<number>(value?.percent ?? 0),
-    amount: fb.control<string>(value?.amount ? String(toMajorUnits(value.amount)) : ''),
+    amount: fb.control<string>(value?.amount ? String(rupeesFromMoney(value.amount)) : ''),
   });
 }
 
 export function readIncentiveComponent(group: IncentiveComponentGroup): IncentiveComponent {
   const v = group.getRawValue();
   if (v.kind === 'NONE') return { kind: 'NONE' };
-  if (v.kind === 'FIXED') return { kind: 'FIXED', amount: money(Number(v.amount)) };
+  if (v.kind === 'FIXED') return { kind: 'FIXED', amount: moneyFromRupees(Number(v.amount)) };
   return { kind: 'PERCENT', percent: Number(v.percent) };
 }
 
@@ -52,7 +70,7 @@ export function makeRenewalGroup(fb: NonNullableFormBuilder, value?: RenewalInce
   return fb.group({
     kind: fb.control<RenewalIncentiveKind>(value?.kind ?? 'NONE'),
     percent: fb.control<number>(value?.percent ?? 0),
-    amount: fb.control<string>(value?.amount ? String(toMajorUnits(value.amount)) : ''),
+    amount: fb.control<string>(value?.amount ? String(rupeesFromMoney(value.amount)) : ''),
     tiers,
     beyondLastTier: makeIncentiveComponentGroup(
       fb,
@@ -68,7 +86,7 @@ export function readRenewalIncentive(group: RenewalGroup): RenewalIncentive {
     return { kind, percent: Number(group.controls.percent.value) };
   }
   if (kind === 'FIXED_INDEFINITE') {
-    return { kind, amount: money(Number(group.controls.amount.value)) };
+    return { kind, amount: moneyFromRupees(Number(group.controls.amount.value)) };
   }
   return {
     kind: 'PER_RENEWAL',

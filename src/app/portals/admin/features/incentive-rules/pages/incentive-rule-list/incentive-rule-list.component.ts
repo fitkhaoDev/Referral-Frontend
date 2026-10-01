@@ -124,17 +124,26 @@ export class IncentiveRuleListComponent {
     });
   }
 
-  private currency(minorUnits: number, code: string): string {
+  private currency(rupees: number, code: string): string {
     return new Intl.NumberFormat(this.locale, {
       style: 'currency',
       currency: code,
       maximumFractionDigits: 0,
-    }).format(minorUnits / 100);
+    }).format(rupees);
+  }
+
+  /** IncentiveRule wire shape is `{ amount: <rupees>, currency }`; fall back to the
+   *  shared `{ minorUnits }` shape in case any legacy rows still carry that. */
+  private rupeesOf(m: { amount?: number; minorUnits?: number } | undefined): number {
+    if (!m) return 0;
+    if (typeof m.amount === 'number') return m.amount;
+    if (typeof m.minorUnits === 'number') return m.minorUnits / 100;
+    return 0;
   }
 
   protected componentSummary(c: IncentiveComponent): string {
     if (c.kind === 'NONE') return '—';
-    if (c.kind === 'FIXED') return c.amount ? this.currency(c.amount.minorUnits, c.amount.currency) : '—';
+    if (c.kind === 'FIXED') return c.amount ? this.currency(this.rupeesOf(c.amount as any), c.amount.currency) : '—';
     return `${c.percent}%`;
   }
 
@@ -146,7 +155,7 @@ export class IncentiveRuleListComponent {
         return `${r.percent}% every renewal`;
       case 'FIXED_INDEFINITE':
         return r.amount
-          ? `${this.currency(r.amount.minorUnits, r.amount.currency)} every renewal`
+          ? `${this.currency(this.rupeesOf(r.amount as any), r.amount.currency)} every renewal`
           : '—';
       case 'PER_RENEWAL': {
         const tiers = (r.tiers ?? [])
