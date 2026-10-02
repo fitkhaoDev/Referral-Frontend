@@ -43,7 +43,7 @@ export class OrganisationFormComponent {
     contactPerson: ['', [Validators.required, Validators.maxLength(120)]],
     mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{10}$/)]],
     email: ['', [Validators.required, Validators.email]],
-    address: ['', [Validators.required, Validators.maxLength(280)]],
+    address: [''],
     status: [true],
     initialPassword: [''],
     confirmPassword: [''],
