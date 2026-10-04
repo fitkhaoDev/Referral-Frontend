@@ -5,6 +5,7 @@ import { Partner } from '../models/partner.model';
 export const partnersList = createListFeature<Partner>({
   name: 'adminPartners',
   selectId: (partner) => partner.id,
+  initialPageSize: 10,
   initialSort: [{ field: 'createdAt', direction: 'desc' }],
 });
 
