@@ -62,7 +62,7 @@ export class AdminProfileComponent {
       .subscribe(({ audience }) => {
         if (audience !== 'admin') return;
         this.form.reset();
-        this.notifications.success('Password changed');
+        this.notifications.success('Password changed successfully');
       });
   }
 

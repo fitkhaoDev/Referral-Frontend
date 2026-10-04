@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Actions, ofType } from '@ngrx/effects';
 import { AuthFacadeService } from '@core/auth/services/auth-facade.service';
+import { AuthActions } from '@core/auth/store/auth.actions';
+import { NotificationService } from '@core/notifications/notification.service';
 import { matchWith, strongPassword } from '@shared/validators/password.validators';
 
 @Component({
@@ -14,6 +17,8 @@ import { matchWith, strongPassword } from '@shared/validators/password.validator
 export class PartnerChangePasswordComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthFacadeService);
+  private readonly actions$ = inject(Actions);
+  private readonly notifications = inject(NotificationService);
 
   protected readonly busy = this.auth.busy('partner');
   protected readonly forced = this.auth.mustChangePassword('partner');
@@ -53,6 +58,14 @@ export class PartnerChangePasswordComponent {
     this.form.controls.newPassword.valueChanges
       .pipe(takeUntilDestroyed(destroyRef))
       .subscribe(() => this.form.controls.confirmPassword.updateValueAndValidity());
+
+    this.actions$
+      .pipe(ofType(AuthActions.changePasswordSuccess), takeUntilDestroyed(destroyRef))
+      .subscribe(({ audience }) => {
+        if (audience !== 'partner') return;
+        this.form.reset();
+        this.notifications.success('Password changed successfully');
+      });
   }
 
   protected weakHint(): string {
