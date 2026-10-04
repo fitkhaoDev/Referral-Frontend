@@ -2,6 +2,7 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
+import { lowercaseEmail } from '@shared/validators/email.validators';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { EntityStatus } from '@core/models/common.model';
@@ -48,7 +49,7 @@ export class OrganisationMemberFormDialogComponent {
     name: ['', [Validators.required, Validators.maxLength(120)]],
     specialisation: ['', [Validators.maxLength(80)]],
     mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{10}$/)]],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, lowercaseEmail()]],
     active: [true],
   });
 

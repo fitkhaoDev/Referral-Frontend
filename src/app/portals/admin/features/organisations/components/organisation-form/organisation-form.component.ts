@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ApiError } from '@core/models/api.model';
 import { SelectOption } from '@shared/components/form-fields/select-field/select-field.component';
+import { lowercaseEmail } from '@shared/validators/email.validators';
 import { matchWith, strongPassword } from '@shared/validators/password.validators';
 import {
   CreateOrganisationPayload,
@@ -42,7 +43,7 @@ export class OrganisationFormComponent {
     referralCode: ['', [Validators.pattern(/^[A-Z0-9-]{4,32}$/)]],
     contactPerson: ['', [Validators.required, Validators.maxLength(120)]],
     mobile: ['', [Validators.required, Validators.pattern(/^[+0-9 ()-]{10}$/)]],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', [Validators.required, lowercaseEmail()]],
     address: [''],
     status: [true],
     initialPassword: [''],

@@ -64,6 +64,7 @@ export class TextFieldComponent {
     const map: Record<string, string> = {
       required: `${this.label()} is required.`,
       email: 'Enter a valid email address.',
+      uppercase: 'Email must be lowercase — no capital letters.',
       minlength: `${this.label()} is too short.`,
       maxlength: `${this.label()} is too long.`,
       pattern: `${this.label()} format is invalid.`,
