@@ -45,12 +45,7 @@ export const ADMIN_NAV: readonly NavGroup[] = [
   {
     heading: 'Referrals',
     items: [
-      { label: 'Referrals', path: '/admin/referrals', permission: 'referral:read' },
-      {
-        label: 'Referral events',
-        path: '/admin/referral-events',
-        permission: 'referral-event:manage',
-      },
+      { label: 'Referrals (audit log)', path: '/admin/referrals', permission: 'referral:read' },
     ],
   },
   {
@@ -63,7 +58,7 @@ export const ADMIN_NAV: readonly NavGroup[] = [
       },
       { label: 'Discount rules', path: '/admin/discount-rules', permission: 'discount-rule:manage' },
       { label: 'Commissions', path: '/admin/commissions', permission: 'commission:read' },
-      { label: 'Wallets', path: '/admin/wallet', permission: 'wallet:read' },
+      { label: 'Partner payouts', path: '/admin/wallet', permission: 'wallet:read' },
       { label: 'Withdrawals', path: '/admin/withdrawals', permission: 'withdrawal:read' },
     ],
   },

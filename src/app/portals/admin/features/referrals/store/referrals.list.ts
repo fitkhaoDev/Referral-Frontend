@@ -5,6 +5,7 @@ import { Referral } from '../models/referral.model';
 export const referralsList = createListFeature<Referral>({
   name: 'adminReferrals',
   selectId: (referral) => referral.id,
+  initialPageSize: 10,
   initialSort: [{ field: 'occurredAt', direction: 'desc' }],
 });
 

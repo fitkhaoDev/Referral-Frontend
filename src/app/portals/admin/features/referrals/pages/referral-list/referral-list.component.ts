@@ -32,15 +32,16 @@ export class ReferralListComponent {
   protected readonly organisationOptions = toSignal(this.options.organisationOptions$, {
     initialValue: [] as SelectOption[],
   });
-  protected readonly eventOptions = toSignal(this.options.eventOptions$, {
-    initialValue: [] as SelectOption[],
-  });
+  // Event filter temporarily disabled — referral-events feature deprecated.
+  // protected readonly eventOptions = toSignal(this.options.eventOptions$, {
+  //   initialValue: [] as SelectOption[],
+  // });
 
   protected readonly fromDate = new FormControl<string>('', { nonNullable: true });
   protected readonly toDate = new FormControl<string>('', { nonNullable: true });
   protected readonly categoryFilter = new FormControl<string>('', { nonNullable: true });
   protected readonly organisationFilter = new FormControl<string>('', { nonNullable: true });
-  protected readonly eventFilter = new FormControl<string>('', { nonNullable: true });
+  // protected readonly eventFilter = new FormControl<string>('', { nonNullable: true });
   protected readonly commissionFilter = new FormControl<string>('', { nonNullable: true });
 
   protected readonly categoryOptions: SelectOption[] = [
@@ -78,7 +79,7 @@ export class ReferralListComponent {
       this.sync(this.toDate, f.toDate ?? '');
       this.sync(this.categoryFilter, f.partnerCategory ?? '');
       this.sync(this.organisationFilter, f.organisationId ?? '');
-      this.sync(this.eventFilter, f.eventCode ?? '');
+      // this.sync(this.eventFilter, f.eventCode ?? '');
       this.sync(this.commissionFilter, f.commissionStatus ?? '');
     });
 
@@ -87,7 +88,7 @@ export class ReferralListComponent {
       this.toDate,
       this.categoryFilter,
       this.organisationFilter,
-      this.eventFilter,
+      // this.eventFilter,
       this.commissionFilter,
     ]) {
       control.valueChanges.subscribe(() => this.push());
@@ -104,7 +105,7 @@ export class ReferralListComponent {
       toDate: this.toDate.value || undefined,
       partnerCategory: (this.categoryFilter.value || undefined) as Referral['partnerCategory'] | undefined,
       organisationId: this.organisationFilter.value || undefined,
-      eventCode: this.eventFilter.value || undefined,
+      // eventCode: this.eventFilter.value || undefined,
       commissionStatus: (this.commissionFilter.value || undefined) as ReferralCommissionStatus | undefined,
     });
   }
