@@ -5,6 +5,7 @@ import { Withdrawal } from '../models/withdrawal.model';
 export const withdrawalsList = createListFeature<Withdrawal>({
   name: 'adminWithdrawals',
   selectId: (withdrawal) => withdrawal.id,
+  initialPageSize: 10,
   initialSort: [{ field: 'requestedAt', direction: 'desc' }],
 });
 

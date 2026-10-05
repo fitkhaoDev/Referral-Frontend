@@ -208,6 +208,14 @@ export class MockWithdrawalApiService extends WithdrawalApi {
     return mockOk(POLICY);
   }
 
+  override retry(id: Id): Observable<Withdrawal> {
+    return this.transition(id, 'RETRY' as any, (r) => ({
+      ...r,
+      status: 'PROCESSING',
+      processingStartedAt: new Date().toISOString(),
+    }));
+  }
+
   override approve(id: Id): Observable<Withdrawal> {
     return this.transition(id, 'APPROVE', (r) => ({
       ...r,

@@ -47,6 +47,11 @@ export abstract class WithdrawalApi {
   abstract get(id: Id): Observable<Withdrawal>;
   abstract getPolicy(): Observable<WithdrawalPolicy>;
 
+  /** Auto-payout flow: the only admin action available on a FAILED row. */
+  abstract retry(id: Id): Observable<Withdrawal>;
+
+  /** Legacy manual-flow transitions — the backend no longer accepts these in
+   *  the auto-payout model. Implementations may throw to make that explicit. */
   abstract approve(id: Id): Observable<Withdrawal>;
   abstract reject(id: Id, payload: RejectWithdrawalPayload): Observable<Withdrawal>;
   abstract markProcessing(id: Id): Observable<Withdrawal>;

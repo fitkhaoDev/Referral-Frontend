@@ -22,6 +22,7 @@ const ACTION_VARIANT: Record<WithdrawalAction, ButtonVariant> = {
   MARK_PAID: 'primary',
   REJECT: 'danger',
   MARK_FAILED: 'danger',
+  RETRY: 'primary',
 };
 
 @Component({

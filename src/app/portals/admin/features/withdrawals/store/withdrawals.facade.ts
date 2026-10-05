@@ -89,4 +89,7 @@ export class WithdrawalsFacade {
   markFailed(id: Id, reason: string): void {
     this.store.dispatch(WithdrawalActions.markFailed({ id, reason }));
   }
+  retry(id: Id): void {
+    this.store.dispatch(WithdrawalActions.retry({ id }));
+  }
 }

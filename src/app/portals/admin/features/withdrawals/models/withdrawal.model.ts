@@ -50,7 +50,8 @@ export type WithdrawalAction =
   | 'REJECT'
   | 'MARK_PROCESSING'
   | 'MARK_PAID'
-  | 'MARK_FAILED';
+  | 'MARK_FAILED'
+  | 'RETRY';
 
 export const WITHDRAWAL_ACTION_LABEL: Record<WithdrawalAction, string> = {
   APPROVE: 'Approve',
@@ -58,6 +59,7 @@ export const WITHDRAWAL_ACTION_LABEL: Record<WithdrawalAction, string> = {
   MARK_PROCESSING: 'Move to processing',
   MARK_PAID: 'Mark as paid',
   MARK_FAILED: 'Mark as failed',
+  RETRY: 'Retry payout',
 };
 
 export interface Withdrawal {
@@ -110,7 +112,11 @@ export interface Withdrawal {
  */
 export interface WithdrawalPolicy {
   readonly minAmount: Money;
-  readonly maxRequestsPerCalendarMonth: number;
+  /** @deprecated Prefer the per-day caps below. */
+  readonly maxRequestsPerCalendarMonth?: number;
+  readonly maxRequestsPerDay?: number;
+  readonly maxAmountPerDay?: Money;
+  readonly cooldownMinutes?: number;
   readonly currency: string;
   /** Optional human note the backend may return for display. */
   readonly note?: string;

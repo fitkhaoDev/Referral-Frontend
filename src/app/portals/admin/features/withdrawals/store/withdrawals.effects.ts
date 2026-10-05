@@ -114,6 +114,18 @@ export class WithdrawalsEffects {
     ),
   );
 
+  readonly retry$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WithdrawalActions.retry),
+      exhaustMap(({ id }) =>
+        this.api.retry(id).pipe(
+          map((withdrawal) => WithdrawalActions.actionSuccess({ withdrawal, action: 'RETRY' })),
+          catchError((err) => of(WithdrawalActions.actionFailure({ error: toApiError(err) }))),
+        ),
+      ),
+    ),
+  );
+
   readonly reloadListAfterAction$ = createEffect(() =>
     this.actions$.pipe(
       ofType(WithdrawalActions.actionSuccess),

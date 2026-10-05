@@ -65,6 +65,7 @@ export class WithdrawalActionDialogComponent {
     MARK_PAID: 'Confirm the payout has settled and record its bank/UPI reference.',
     REJECT: 'Reject this request. The beneficiary keeps their balance and can request again.',
     MARK_FAILED: 'Record that the payout failed. It can be moved back to processing to retry.',
+    RETRY: 'Create a fresh payout attempt for this failed withdrawal. A new withdrawal row is created and the vendor payout is initiated automatically.',
   };
   protected readonly bodyText = WithdrawalActionDialogComponent.BODY[this.action];
 
@@ -116,6 +117,7 @@ export class WithdrawalActionDialogComponent {
       return;
     }
     if (this.action === 'APPROVE') this.facade.approve(id);
-    else this.facade.markProcessing(id);
+    else if (this.action === 'MARK_PROCESSING') this.facade.markProcessing(id);
+    else if (this.action === 'RETRY') this.facade.retry(id);
   }
 }

@@ -1,0 +1,64 @@
+<section class="fk-page">
+  <h1>Wallet</h1>
+
+  @if (wallet(); as w) {
+    @if (w.suspended) {
+      <app-alert tone="warning" title="Withdrawals disabled">
+        {{ w.suspended.reason || 'Withdrawals are temporarily disabled on your account. Contact support.' }}
+      </app-alert>
+    }
+    <div class="cards">
+      <div class="card card--primary">
+        <span class="card__label">Available</span>
+        <span class="card__value fk-num">{{ w.available | money }}</span>
+        <span class="card__hint">Ready to withdraw</span>
+      </div>
+      <div class="card">
+        <span class="card__label">Held for withdrawal</span>
+        <span class="card__value fk-num">{{ w.heldForWithdrawal | money }}</span>
+        <span class="card__hint">Reserved for in-flight payouts</span>
+      </div>
+      @if ((w.outstandingRecovery?.minorUnits ?? 0) > 0) {
+        <div class="card card--recovery">
+          <span class="card__label">Recovery due</span>
+          <span class="card__value fk-num">{{ w.outstandingRecovery | money }}</span>
+          <span class="card__hint">Deducted before withdrawal</span>
+        </div>
+      }
+    </div>
+
+    <div class="actions">
+      <app-button
+        [disabled]="!canWithdraw()"
+        (pressed)="openWithdraw()"
+      >Withdraw</app-button>
+      <app-button variant="secondary" (pressed)="goToWithdrawals()">
+        See withdrawal history
+      </app-button>
+    </div>
+
+    <h2>Recent withdrawals</h2>
+    @if (recentWithdrawals().length === 0) {
+      <p class="muted">No withdrawals yet.</p>
+    } @else {
+      <ul class="recent">
+        @for (r of recentWithdrawals(); track r.id) {
+          <li class="recent__row">
+            <span class="recent__ref">{{ r.reference }}</span>
+            <span class="recent__amount fk-num">{{ r.amount | money }}</span>
+            <span class="recent__status">{{ r.status }}</span>
+            <span class="recent__when">{{ r.requestedAt | date: 'mediumDate' }}</span>
+          </li>
+        }
+      </ul>
+    }
+
+    <aside class="totals">
+      <span>Total earned: {{ w.totalEarned | money }}</span>
+      <span>Total withdrawn: {{ w.withdrawn | money }}</span>
+      <span>Fees paid: {{ w.feesPaid | money }}</span>
+    </aside>
+  } @else {
+    <p class="muted">Loading wallet…</p>
+  }
+</section>

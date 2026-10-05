@@ -1,0 +1,58 @@
+<app-dialog-shell
+  [title]="isEdit ? 'Edit bank account' : 'Add bank account'"
+  subtitle="We verify that the bank account is registered in your name. No money is moved."
+  (dismissed)="cancel()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+    @if (error(); as msg) {
+      <app-alert tone="error" title="Could not save">{{ msg }}</app-alert>
+    }
+
+    <label class="field">
+      <span class="field__label">Bank</span>
+      <select formControlName="bankCode">
+        <option value="" disabled>Select your bank</option>
+        @for (bank of banks; track bank.code) {
+          <option [value]="bank.code">{{ bank.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Nickname (e.g. Primary HDFC)</span>
+      <input type="text" formControlName="nickname" maxlength="40" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">Account number</span>
+      <input type="text" formControlName="accountNumber" inputmode="numeric" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">Confirm account number</span>
+      <input type="text" formControlName="confirmAccountNumber" inputmode="numeric" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">IFSC</span>
+      <input type="text" formControlName="ifsc" style="text-transform: uppercase" />
+    </label>
+
+    <label class="row">
+      <input type="checkbox" formControlName="makePrimary" />
+      <span>Make this my primary account</span>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Confirm your current password</span>
+      <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+    </label>
+  </form>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    <app-button [loading]="submitting()" (pressed)="submit()">
+      {{ isEdit ? 'Save changes' : 'Add account' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

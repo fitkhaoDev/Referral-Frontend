@@ -19,6 +19,7 @@ export const WithdrawalActions = createActionGroup({
     'Mark Processing': props<{ id: Id }>(),
     'Mark Paid': props<{ id: Id; paymentReference: string }>(),
     'Mark Failed': props<{ id: Id; reason: string }>(),
+    Retry: props<{ id: Id }>(),
 
     'Action Success': props<{ withdrawal: Withdrawal; action: WithdrawalAction }>(),
     'Action Failure': props<{ error: ApiError }>(),

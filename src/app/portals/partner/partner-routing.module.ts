@@ -55,9 +55,11 @@ const routes: Routes = [
         title: 'Dashboard · FitKhao Partners',
       },
       stub('referrals', 'Referrals'),
-      stub('wallet', 'Wallet'),
-      stub('withdrawals', 'Withdrawals'),
-      stub('profile', 'Profile'),
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/finance/partner-finance.module').then((m) => m.PartnerFinanceModule),
+      },
       { path: '**', redirectTo: 'dashboard' },
     ],
   },

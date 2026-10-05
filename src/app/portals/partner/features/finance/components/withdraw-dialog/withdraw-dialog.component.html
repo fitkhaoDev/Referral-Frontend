@@ -1,0 +1,63 @@
+<app-dialog-shell
+  title="Withdraw to your bank"
+  [subtitle]="wallet() ? ('Available ' + (wallet()!.withdrawable | money)) : ''"
+  (dismissed)="cancel()"
+>
+  @if (verifiedBanks().length === 0) {
+    <app-alert tone="warning" title="No verified bank account">
+      Please add and verify a bank account from your Profile before withdrawing.
+    </app-alert>
+  } @else if (wallet()?.suspended) {
+    <app-alert tone="warning" title="Withdrawals disabled">
+      {{ wallet()!.suspended!.reason }}
+    </app-alert>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+      <label class="field">
+        <span class="field__label">Destination</span>
+        <select formControlName="bankAccountId">
+          @for (b of verifiedBanks(); track b.id) {
+            <option [value]="b.id">
+              {{ b.nickname }} — {{ b.bankName }} ••••{{ b.accountNumberLast4 }}{{ b.isPrimary ? ' (Primary)' : '' }}
+            </option>
+          }
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field__label">Amount (₹)</span>
+        <input
+          type="number"
+          formControlName="amount"
+          [min]="majorUnits(wallet()?.minWithdrawal)"
+          [max]="majorUnits(wallet()?.withdrawable)"
+        />
+      </label>
+
+      @if (quote(); as q) {
+        <div class="breakdown">
+          <div><span>Amount to credit</span><span class="fk-num">{{ q.amount | money }}</span></div>
+          <div><span>Convenience fee</span><span class="fk-num">{{ q.convenienceFee | money }}</span></div>
+          <div class="breakdown__total">
+            <span>Total wallet debit</span><span class="fk-num">{{ q.totalDebit | money }}</span>
+          </div>
+        </div>
+      } @else if (quoteLoading()) {
+        <p class="muted">Fetching quote…</p>
+      }
+
+      @if (error(); as msg) {
+        <app-alert tone="error" title="Could not withdraw">{{ msg }}</app-alert>
+      }
+    </form>
+  }
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    @if (verifiedBanks().length > 0 && !wallet()?.suspended) {
+      <app-button [loading]="submitting()" (pressed)="submit()">
+        Withdraw
+      </app-button>
+    }
+  </div>
+</app-dialog-shell>
