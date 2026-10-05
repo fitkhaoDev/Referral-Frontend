@@ -104,12 +104,12 @@ export class IncentiveRuleFormDialogComponent {
       const scope = this.scopeType();
       const ctrl = this.form.controls.beneficiary;
       if (scope === 'PARTNER_TYPE') {
-        ctrl.setValue('PARTNER', { emitEvent: false });
+        if (ctrl.value !== 'PARTNER') ctrl.setValue('PARTNER');
         ctrl.disable({ emitEvent: false });
       } else {
         ctrl.enable({ emitEvent: false });
         if (scope === 'ORGANISATION_TYPE' || scope === 'ORGANISATION') {
-          if (ctrl.value === 'PARTNER') ctrl.setValue('ORGANISATION', { emitEvent: false });
+          if (ctrl.value === 'PARTNER') ctrl.setValue('ORGANISATION');
         }
       }
     });
