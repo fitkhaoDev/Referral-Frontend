@@ -35,6 +35,24 @@ export interface AddBankAccountPayload {
 }
 export type EditBankAccountPayload = AddBankAccountPayload;
 
+export interface PartnerProfile {
+  readonly id: string;
+  readonly partnerId: string;
+  readonly name: string;
+  readonly partnerTypeName: string;
+  readonly specialisation?: string;
+  readonly mobile: string;
+  readonly email: string;
+  readonly professionalAddress?: string;
+  readonly referralCode: string;
+  readonly status: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface UpdatePartnerProfilePayload {
+  readonly name?: string;
+  readonly professionalAddress?: string;
+}
+
 export interface PartnerWalletSummary {
   readonly available: Money;
   readonly pending: Money;

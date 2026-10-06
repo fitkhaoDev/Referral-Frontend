@@ -1,0 +1,84 @@
+<section class="fk-page">
+  <h1>Referrals</h1>
+  <p class="sub muted">Subscriptions attributed to your referral code.</p>
+
+  <form [formGroup]="filters" class="filters" novalidate>
+    <label class="field field--grow">
+      <span class="field__label">Search plan</span>
+      <input type="text" formControlName="search" placeholder="Plan name or code" />
+    </label>
+    <label class="field">
+      <span class="field__label">Commission</span>
+      <select formControlName="commissionStatus">
+        <option value="">All</option>
+        @for (s of STATUSES; track s) {
+          <option [value]="s">{{ STATUS_LABEL[s] }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span class="field__label">From</span>
+      <input type="date" formControlName="fromDate" />
+    </label>
+    <label class="field">
+      <span class="field__label">To</span>
+      <input type="date" formControlName="toDate" />
+    </label>
+    <!-- <app-button variant="secondary" size="sm" (pressed)="resetFilters()">Reset</app-button> -->
+  </form>
+
+  @if (data(); as d) {
+    @if (d.items.length === 0) {
+      <p class="muted empty">No referrals match the current filters.</p>
+    } @else {
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Plan</th>
+              <th class="num">Plan amount</th>
+              <th class="num">Commission</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of rows(); track r.id) {
+              <tr>
+                <td>{{ r.occurredAt | date: 'mediumDate' }}</td>
+                <td>
+                  <div>{{ r.customerName }}</div>
+                  @if (r.customerMobile) {
+                    <div class="muted small fk-num">{{ r.customerMobile }}</div>
+                  }
+                </td>
+                <td>{{ r.plan }}</td>
+                <td class="num fk-num">{{ r.planAmount ? (r.planAmount | money) : '—' }}</td>
+                <td class="num fk-num">{{ r.commissionAmount ? (r.commissionAmount | money) : '—' }}</td>
+                <td>
+                  <app-status-badge
+                    [label]="STATUS_LABEL[r.commissionStatus]"
+                    [tone]="statusTone(r.commissionStatus)"
+                  ></app-status-badge>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="pager">
+        <app-button variant="secondary" size="sm" [disabled]="!canPrev()" (pressed)="prev()">Previous</app-button>
+        <span class="pager__info muted">
+          Page {{ d.page + 1 }} / {{ d.totalPages || 1 }} · {{ d.totalItems }} total
+        </span>
+        <app-button variant="secondary" size="sm" [disabled]="!canNext()" (pressed)="next()">Next</app-button>
+      </nav>
+    }
+  } @else if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else {
+    <p class="muted">Could not load referrals.</p>
+  }
+</section>

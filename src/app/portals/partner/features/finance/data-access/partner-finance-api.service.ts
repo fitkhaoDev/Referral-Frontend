@@ -8,9 +8,11 @@ import {
   EditBankAccountPayload,
   PartnerBankAccount,
   PartnerBankAccountList,
+  PartnerProfile,
   PartnerWalletSummary,
   PartnerWithdrawal,
   PartnerWithdrawalPage,
+  UpdatePartnerProfilePayload,
   WithdrawalQuote,
 } from '../models/finance.model';
 
@@ -19,6 +21,16 @@ import {
 export class PartnerFinanceApi {
   private readonly http = inject(HttpClient);
   private readonly base = `${inject(APP_CONFIG).apiBaseUrl}/partner`;
+
+  // ─ Profile ───────────────────────────────────────────────────────────────
+  getMyProfile(): Observable<PartnerProfile> {
+    return this.http.get<any>(`${this.base}/me/profile`).pipe(map((res) => res.data));
+  }
+  updateMyProfile(payload: UpdatePartnerProfilePayload): Observable<PartnerProfile> {
+    return this.http
+      .put<any>(`${this.base}/me/profile`, payload)
+      .pipe(map((res) => res.data));
+  }
 
   // ─ Bank accounts ─────────────────────────────────────────────────────────
   listBankAccounts(): Observable<PartnerBankAccountList> {

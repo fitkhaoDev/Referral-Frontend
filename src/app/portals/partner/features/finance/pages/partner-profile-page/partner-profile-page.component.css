@@ -1,11 +1,97 @@
-.meta {
+.card {
+  background: var(--fk-white);
+  border: 1px solid var(--fk-border);
+  border-radius: var(--fk-radius-lg);
+  padding: var(--fk-space-5);
+  margin-bottom: var(--fk-space-5);
+}
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fk-space-3);
+  margin-bottom: var(--fk-space-4);
+}
+.card__title {
+  margin: 0;
+  font-size: var(--fk-text-lg);
+}
+.card__sub {
+  margin: var(--fk-space-1) 0 0;
   color: var(--fk-faint);
   font-size: var(--fk-text-sm);
 }
+
+/* Profile facts grid */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--fk-space-3) var(--fk-space-5);
+  margin: 0;
+}
+.facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.facts__wide {
+  grid-column: 1 / -1;
+}
+.facts dt {
+  font-size: var(--fk-text-sm);
+  color: var(--fk-faint);
+}
+.facts dd {
+  margin: 0;
+  font-weight: var(--fk-weight-medium);
+  word-break: break-word;
+}
+.hint {
+  margin-top: var(--fk-space-4);
+  font-size: var(--fk-text-sm);
+}
+@media (max-width: 640px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Edit form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-4);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fk-space-1);
+}
+.field__label {
+  font-size: var(--fk-text-sm);
+  color: var(--fk-faint);
+}
+.form input[type='text'],
+.form textarea {
+  min-height: 44px;
+  padding: var(--fk-space-2) var(--fk-space-3);
+  border: 1px solid var(--fk-border-strong);
+  border-radius: var(--fk-radius-md);
+  background: var(--fk-white);
+  font: inherit;
+  resize: vertical;
+}
+.form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--fk-space-3);
+}
+
+/* Bank accounts (unchanged visual rules) */
 .accs {
   list-style: none;
   padding: 0;
-  margin: var(--fk-space-4) 0;
+  margin: 0;
   display: grid;
   gap: var(--fk-space-3);
 }

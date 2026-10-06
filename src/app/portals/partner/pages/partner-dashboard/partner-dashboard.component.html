@@ -1,24 +1,104 @@
 <section class="fk-page">
-  <header class="head">
-    <p class="hi">Hello,</p>
-    <h1>{{ user()?.displayName }}</h1>
-    <p class="code">
-      Referral code <strong>{{ user()?.referralCode }}</strong>
-    </p>
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero__text">
+      <p class="hero__hi">Hello,</p>
+      <h1 class="hero__name">{{ user()?.displayName || 'Partner' }}</h1>
+      @if (user()?.referralCode; as code) {
+        <div class="code">
+          <span class="code__label">Your referral code</span>
+          <div class="code__row">
+            <strong class="code__value fk-num">{{ code }}</strong>
+            <app-button variant="secondary" size="sm" (pressed)="copyCode()">
+              {{ copied() ? 'Copied' : 'Copy' }}
+            </app-button>
+          </div>
+          <p class="code__hint">Share this code — you earn commission whenever it is used.</p>
+        </div>
+      }
+    </div>
+
+    <div class="hero__actions">
+      <app-button (pressed)="go('/partner/wallet')">Open wallet</app-button>
+      <app-button variant="secondary" (pressed)="go('/partner/referrals')">View referrals</app-button>
+    </div>
   </header>
 
-  <div class="metrics" aria-hidden="true">
-    @for (m of skeletons; track $index) {
-      <div class="metric">
-        <span class="metric__k"></span>
-        <span class="metric__v"></span>
-      </div>
-    }
+  <!-- Metrics -->
+  <div class="metrics">
+    <article class="metric metric--primary">
+      <span class="metric__k">Available to withdraw</span>
+      @if (wallet(); as w) {
+        <strong class="metric__v fk-num">{{ w.withdrawable | money }}</strong>
+        @if (w.suspended) {
+          <span class="metric__hint danger">Withdrawals paused · {{ w.suspended.reason }}</span>
+        } @else {
+          <span class="metric__hint">Min withdrawal {{ w.minWithdrawal | money }}</span>
+        }
+      } @else {
+        <span class="metric__v placeholder"></span>
+      }
+    </article>
+
+    <article class="metric">
+      <span class="metric__k">Total earned</span>
+      @if (wallet(); as w) {
+        <strong class="metric__v fk-num">{{ w.totalEarned | money }}</strong>
+      } @else {
+        <span class="metric__v placeholder"></span>
+      }
+    </article>
+
+    <article class="metric">
+      <span class="metric__k">Total withdrawn</span>
+      @if (wallet(); as w) {
+        <strong class="metric__v fk-num">{{ w.withdrawn | money }}</strong>
+      } @else {
+        <span class="metric__v placeholder"></span>
+      }
+    </article>
+
+    <article class="metric">
+      <span class="metric__k">Total referrals</span>
+      @if (recent(); as r) {
+        <strong class="metric__v fk-num">{{ r.totalItems }}</strong>
+      } @else {
+        <span class="metric__v placeholder"></span>
+      }
+    </article>
   </div>
 
-  <p class="note">
-    Your live totals — referrals, counselling, purchases, renewals, earnings, available and pending
-    balance — plus monthly / quarterly / yearly charts are being connected to the analytics contract
-    next.
-  </p>
+  <!-- Recent referrals -->
+  <section class="panel">
+    <header class="panel__head">
+      <h2 class="panel__title">Recent referrals</h2>
+      <app-button variant="secondary" size="sm" (pressed)="go('/partner/referrals')">See all</app-button>
+    </header>
+
+    @if (recent(); as r) {
+      @if (r.items.length === 0) {
+        <p class="muted">No referrals yet. Share your code to get started.</p>
+      } @else {
+        <ul class="rlist">
+          @for (ref of r.items; track ref.id) {
+            <li class="rlist__row">
+              <div class="rlist__who">
+                <div class="rlist__name">{{ ref.customerName || '—' }}</div>
+                <div class="rlist__sub muted small">{{ ref.plan }} · {{ ref.occurredAt | date: 'mediumDate' }}</div>
+              </div>
+              <div class="rlist__amount fk-num">
+                {{ ref.commissionAmount ? (ref.commissionAmount | money) : '—' }}
+              </div>
+              <app-status-badge
+                [label]="STATUS_LABEL[ref.commissionStatus]"
+                [tone]="statusTone(ref.commissionStatus)"
+              ></app-status-badge>
+            </li>
+          }
+        </ul>
+      }
+    } @else {
+      <p class="muted">Loading…</p>
+    }
+  </section>
 </section>

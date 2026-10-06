@@ -3,20 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { PartnerAuthGuard } from '@core/auth/guards/partner-auth.guard';
 import { PartnerGuestGuard } from '@core/auth/guards/partner-guest.guard';
 import { PartnerPasswordChangeGuard } from '@core/auth/guards/partner-password-change.guard';
-import { PlaceholderComponent } from '@shared/pages/placeholder/placeholder.component';
 import { PartnerChangePasswordComponent } from './pages/partner-change-password/partner-change-password.component';
 import { PartnerDashboardComponent } from './pages/partner-dashboard/partner-dashboard.component';
 import { PartnerLoginComponent } from './pages/partner-login/partner-login.component';
 import { PartnerShellComponent } from './shell/partner-shell/partner-shell.component';
-
-function stub(path: string, label: string): Routes[number] {
-  return {
-    path,
-    component: PlaceholderComponent,
-    title: `${label} · FitKhao Partners`,
-    data: { label },
-  };
-}
 
 /**
  * Partner portal routes (lazy-loaded as a unit).
@@ -54,7 +44,13 @@ const routes: Routes = [
         component: PartnerDashboardComponent,
         title: 'Dashboard · FitKhao Partners',
       },
-      stub('referrals', 'Referrals'),
+      {
+        path: 'referrals',
+        loadChildren: () =>
+          import('./features/referrals/partner-referrals.module').then(
+            (m) => m.PartnerReferralsModule,
+          ),
+      },
       {
         path: '',
         loadChildren: () =>

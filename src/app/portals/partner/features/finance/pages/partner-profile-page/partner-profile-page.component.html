@@ -1,45 +1,109 @@
 <section class="fk-page">
   <h1>Profile</h1>
-  <h2>Bank accounts</h2>
-  @if (data(); as d) {
-    <p class="meta">
-      {{ d.accounts.length }} / 5 accounts · {{ d.monthlyAddEditCount }} / {{ d.monthlyAddEditLimit }} changes used this month.
-    </p>
 
-    @if (d.accounts.length === 0) {
-      <p class="muted">You haven't added a bank account yet. Add one to receive your earnings.</p>
-    } @else {
-      <ul class="accs">
-        @for (acc of d.accounts; track acc.id) {
-          <li class="acc" [class.acc--primary]="acc.isPrimary">
-            <div class="acc__head">
-              @if (acc.isPrimary) { <span class="star">★</span> }
-              <span class="acc__nick">{{ acc.nickname }}</span>
-              <app-status-badge [label]="statusLabel(acc.verificationStatus)" [tone]="tone(acc.verificationStatus)"></app-status-badge>
-            </div>
-            <div class="acc__meta">{{ acc.bankName }}</div>
-            <div class="acc__meta">
-              {{ acc.accountHolder }} · ••••{{ acc.accountNumberLast4 }} · {{ acc.ifsc }}
-            </div>
-            @if (acc.verificationStatus === 'FAILED' && acc.verificationFailureReason) {
-              <div class="acc__err">{{ acc.verificationFailureReason }}</div>
-            }
-            <div class="acc__actions">
-              @if (!acc.isPrimary && acc.verificationStatus === 'VERIFIED') {
-                <app-button variant="secondary" size="sm" (pressed)="makePrimary(acc)">Make primary</app-button>
-              }
-              <app-button variant="secondary" size="sm" (pressed)="edit(acc)">Edit</app-button>
-              <app-button variant="secondary" size="sm" (pressed)="delete(acc)">Delete</app-button>
-            </div>
-          </li>
+  <!-- Profile details card -->
+  @if (profile(); as p) {
+    <article class="card">
+      <header class="card__head">
+        <div>
+          <h2 class="card__title">Personal details</h2>
+          <p class="card__sub">Partner ID: <strong class="fk-num">{{ p.partnerId }}</strong> · Referral code: <strong class="fk-num">{{ p.referralCode }}</strong></p>
+        </div>
+        @if (!editing()) {
+          <app-button variant="secondary" size="sm" (pressed)="startEdit()">Edit</app-button>
         }
-      </ul>
-    }
-    <app-button
-      [disabled]="d.accounts.length >= 5 || d.monthlyAddEditCount >= d.monthlyAddEditLimit"
-      (pressed)="add()"
-    >+ Add bank account</app-button>
+      </header>
+
+      @if (!editing()) {
+        <dl class="facts">
+          <div><dt>Name</dt><dd>{{ p.name }}</dd></div>
+          <div><dt>Partner type</dt><dd>{{ p.partnerTypeName }}</dd></div>
+          @if (p.specialisation) {
+            <div><dt>Specialisation</dt><dd>{{ p.specialisation }}</dd></div>
+          }
+          <div><dt>Mobile</dt><dd class="fk-num">{{ p.mobile }}</dd></div>
+          <div><dt>Email</dt><dd>{{ p.email }}</dd></div>
+          <div class="facts__wide">
+            <dt>Professional address</dt>
+            <dd>{{ p.professionalAddress || '—' }}</dd>
+          </div>
+        </dl>
+        <p class="hint muted">
+          To change your email, mobile, or partner type, please contact support — these are tied to your KYC.
+        </p>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="saveProfile()" novalidate class="form">
+          <label class="field">
+            <span class="field__label">Name</span>
+            <input type="text" formControlName="name" maxlength="120" />
+          </label>
+          <label class="field">
+            <span class="field__label">Professional address</span>
+            <textarea formControlName="professionalAddress" rows="3" maxlength="240"></textarea>
+          </label>
+          <div class="form__actions">
+            <app-button variant="secondary" (pressed)="cancelEdit()">Cancel</app-button>
+            <app-button [loading]="savingProfile()" (pressed)="saveProfile()">Save changes</app-button>
+          </div>
+        </form>
+      }
+    </article>
   } @else {
-    <p class="muted">Loading…</p>
+    <p class="muted">Loading profile…</p>
   }
+
+  <!-- Bank accounts card -->
+  <article class="card">
+    <header class="card__head">
+      <div>
+        <h2 class="card__title">Bank accounts</h2>
+        @if (bankData(); as d) {
+          <p class="card__sub">
+            {{ d.accounts.length }} / 5 accounts · {{ d.monthlyAddEditCount }} / {{ d.monthlyAddEditLimit }} changes used this month.
+          </p>
+        }
+      </div>
+      @if (bankData(); as d) {
+        <app-button
+          size="sm"
+          [disabled]="d.accounts.length >= 5 || d.monthlyAddEditCount >= d.monthlyAddEditLimit"
+          (pressed)="addBank()"
+        >+ Add bank account</app-button>
+      }
+    </header>
+
+    @if (bankData(); as d) {
+      @if (d.accounts.length === 0) {
+        <p class="muted">You haven't added a bank account yet. Add one to receive your earnings.</p>
+      } @else {
+        <ul class="accs">
+          @for (acc of d.accounts; track acc.id) {
+            <li class="acc" [class.acc--primary]="acc.isPrimary">
+              <div class="acc__head">
+                @if (acc.isPrimary) { <span class="star" title="Primary">★</span> }
+                <span class="acc__nick">{{ acc.nickname }}</span>
+                <app-status-badge [label]="statusLabel(acc.verificationStatus)" [tone]="tone(acc.verificationStatus)"></app-status-badge>
+              </div>
+              <div class="acc__meta">{{ acc.bankName }}</div>
+              <div class="acc__meta">
+                {{ acc.accountHolder }} · ••••{{ acc.accountNumberLast4 }} · {{ acc.ifsc }}
+              </div>
+              @if (acc.verificationStatus === 'FAILED' && acc.verificationFailureReason) {
+                <div class="acc__err">{{ acc.verificationFailureReason }}</div>
+              }
+              <div class="acc__actions">
+                @if (!acc.isPrimary && acc.verificationStatus === 'VERIFIED') {
+                  <app-button variant="secondary" size="sm" (pressed)="makePrimary(acc)">Make primary</app-button>
+                }
+                <app-button variant="secondary" size="sm" (pressed)="editBank(acc)">Edit</app-button>
+                <app-button variant="secondary" size="sm" (pressed)="deleteBank(acc)">Delete</app-button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    } @else {
+      <p class="muted">Loading bank accounts…</p>
+    }
+  </article>
 </section>
