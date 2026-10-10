@@ -12,6 +12,11 @@
   font-size: var(--fk-text-sm);
   color: var(--fk-faint);
 }
+.field__err {
+  font-size: var(--fk-text-sm);
+  color: var(--fk-danger);
+  margin-top: 2px;
+}
 input[type='text'],
 input[type='password'],
 select {

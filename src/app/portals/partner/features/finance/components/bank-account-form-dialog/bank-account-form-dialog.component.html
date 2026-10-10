@@ -16,26 +16,59 @@
           <option [value]="bank.code">{{ bank.name }}</option>
         }
       </select>
+      @if (form.controls.bankCode.touched && form.controls.bankCode.invalid) {
+        <span class="field__err">Please select your bank.</span>
+      }
     </label>
 
     <label class="field">
       <span class="field__label">Nickname (e.g. Primary HDFC)</span>
       <input type="text" formControlName="nickname" maxlength="40" />
+      @if (form.controls.nickname.touched && form.controls.nickname.invalid) {
+        <span class="field__err">
+          @if (form.controls.nickname.errors?.['required']) { Nickname is required. }
+          @else if (form.controls.nickname.errors?.['minlength']) { Nickname must be at least 2 characters. }
+          @else if (form.controls.nickname.errors?.['maxlength']) { Nickname is too long (max 40). }
+        </span>
+      }
     </label>
 
     <label class="field">
       <span class="field__label">Account number</span>
       <input type="text" formControlName="accountNumber" inputmode="numeric" autocomplete="off" />
+      @if (form.controls.accountNumber.touched && form.controls.accountNumber.invalid) {
+        <span class="field__err">
+          @if (form.controls.accountNumber.errors?.['required']) { Account number is required. }
+          @else if (form.controls.accountNumber.errors?.['pattern']) { Account number must be 9–18 digits (no spaces or letters). }
+        </span>
+      }
     </label>
 
     <label class="field">
       <span class="field__label">Confirm account number</span>
       <input type="text" formControlName="confirmAccountNumber" inputmode="numeric" autocomplete="off" />
+      @if (form.controls.confirmAccountNumber.touched && form.controls.confirmAccountNumber.invalid) {
+        <span class="field__err">Please re-enter the account number.</span>
+      }
+      @else if (
+        form.controls.confirmAccountNumber.touched &&
+        form.controls.accountNumber.value &&
+        form.controls.confirmAccountNumber.value &&
+        form.controls.accountNumber.value !== form.controls.confirmAccountNumber.value
+      ) {
+        <span class="field__err">Account numbers do not match.</span>
+      }
     </label>
 
     <label class="field">
       <span class="field__label">IFSC</span>
       <input type="text" formControlName="ifsc" style="text-transform: uppercase" />
+      @if (form.controls.ifsc.touched && form.controls.ifsc.invalid) {
+        <span class="field__err">
+          @if (form.controls.ifsc.errors?.['required']) { IFSC is required. }
+          @else if (form.controls.ifsc.errors?.['pattern']) { Invalid IFSC. Format: 4 letters, then 0, then 6 letters/digits (e.g. SBIN0123456). }
+        </span>
+      }
     </label>
 
     <label class="row">
@@ -46,6 +79,9 @@
     <label class="field">
       <span class="field__label">Confirm your current password</span>
       <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+      @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
+        <span class="field__err">Please enter your current password.</span>
+      }
     </label>
   </form>
 
