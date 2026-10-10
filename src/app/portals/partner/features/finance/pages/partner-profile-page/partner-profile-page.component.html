@@ -17,15 +17,24 @@
       @if (!editing()) {
         <dl class="facts">
           <div><dt>Name</dt><dd>{{ p.name }}</dd></div>
-          <div><dt>Partner type</dt><dd>{{ p.partnerTypeName }}</dd></div>
+          <div>
+            <dt>{{ p.organisationTypeName ? 'Organisation type' : 'Partner type' }}</dt>
+            <dd>{{ p.organisationTypeName || p.partnerTypeName || '—' }}</dd>
+          </div>
           @if (p.specialisation) {
             <div><dt>Specialisation</dt><dd>{{ p.specialisation }}</dd></div>
           }
+          @if (p.contactPerson) {
+            <div><dt>Contact person</dt><dd>{{ p.contactPerson }}</dd></div>
+          }
           <div><dt>Mobile</dt><dd class="fk-num">{{ p.mobile }}</dd></div>
           <div><dt>Email</dt><dd>{{ p.email }}</dd></div>
+          @if (p.memberCount !== undefined && p.memberCount !== null) {
+            <div><dt>Members</dt><dd class="fk-num">{{ p.memberCount }}</dd></div>
+          }
           <div class="facts__wide">
-            <dt>Professional address</dt>
-            <dd>{{ p.professionalAddress || '—' }}</dd>
+            <dt>{{ p.organisationTypeName ? 'Address' : 'Professional address' }}</dt>
+            <dd>{{ (p.professionalAddress || p.address) || '—' }}</dd>
           </div>
         </dl>
         <p class="hint muted">

@@ -53,10 +53,14 @@ export class PartnerProfilePageComponent {
     { initialValue: null },
   );
 
+  private addressOf(p: PartnerProfile): string {
+    return p.professionalAddress ?? p.address ?? '';
+  }
+
   private hydrate(p: PartnerProfile): void {
     this.profile.set(p);
     this.form.patchValue(
-      { name: p.name, professionalAddress: p.professionalAddress ?? '' },
+      { name: p.name, professionalAddress: this.addressOf(p) },
       { emitEvent: false },
     );
   }
@@ -65,7 +69,7 @@ export class PartnerProfilePageComponent {
     const p = this.profile();
     if (p) {
       this.form.patchValue(
-        { name: p.name, professionalAddress: p.professionalAddress ?? '' },
+        { name: p.name, professionalAddress: this.addressOf(p) },
         { emitEvent: false },
       );
     }

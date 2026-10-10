@@ -35,17 +35,30 @@ export interface AddBankAccountPayload {
 }
 export type EditBankAccountPayload = AddBankAccountPayload;
 
+/**
+ * Union of the individual-partner and organisation profile shapes returned
+ * by `GET /api/partner/me/profile`. Backend returns one or the other
+ * depending on `partnerType`; fields unique to each are optional here.
+ */
 export interface PartnerProfile {
   readonly id: string;
   readonly partnerId: string;
   readonly name: string;
-  readonly partnerTypeName: string;
-  readonly specialisation?: string;
   readonly mobile: string;
   readonly email: string;
-  readonly professionalAddress?: string;
   readonly referralCode: string;
   readonly status: 'ACTIVE' | 'INACTIVE';
+
+  // Individual-partner fields
+  readonly partnerTypeName?: string;
+  readonly specialisation?: string;
+  readonly professionalAddress?: string;
+
+  // Organisation fields
+  readonly organisationTypeName?: string;
+  readonly contactPerson?: string;
+  readonly address?: string;
+  readonly memberCount?: number;
 }
 
 export interface UpdatePartnerProfilePayload {
