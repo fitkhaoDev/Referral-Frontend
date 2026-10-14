@@ -48,7 +48,7 @@ export class IncentiveRuleFormDialogComponent {
   private readonly crudError = this.store.selectSignal(selectIncentiveRulesCrudError);
 
   protected readonly scopeTypeOptions: SelectOption[] = [
-    { value: 'GLOBAL', label: 'All partners' },
+    // { value: 'GLOBAL', label: 'All partners' },
     { value: 'PARTNER_TYPE', label: 'A partner type' },
     { value: 'ORGANISATION_TYPE', label: 'An organisation type' },
     { value: 'ORGANISATION', label: 'A specific organisation' },
