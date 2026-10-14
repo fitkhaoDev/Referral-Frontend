@@ -23,21 +23,31 @@ export function queryToParams(query: PageQuery, defaultSize: number): Params {
   return params;
 }
 
+export interface ParamsToQueryOptions {
+  /** Ignore `size` in the URL and always use `base.size`. */
+  readonly ignoreSize?: boolean;
+  /** Ignore `sort` in the URL and always use `base.sort`. */
+  readonly ignoreSort?: boolean;
+}
+
 /** Parse URL query params back into a {@link PageQuery}, using `base` for fallbacks. */
 export function paramsToQuery(
   map: ParamMap,
   base: PageQuery,
   filterKeys: readonly string[],
+  options: ParamsToQueryOptions = {},
 ): PageQuery {
   const page = Number.parseInt(map.get('page') ?? '', 10);
-  const size = Number.parseInt(map.get('size') ?? '', 10);
+  const size = options.ignoreSize ? NaN : Number.parseInt(map.get('size') ?? '', 10);
   const search = map.get('q') ?? '';
 
   let sort: SortSpec[] = base.sort ? [...base.sort] : [];
-  const rawSort = map.get('sort');
-  if (rawSort) {
-    const [field, dir] = rawSort.split(',');
-    if (field) sort = [{ field, direction: dir === 'desc' ? 'desc' : 'asc' }];
+  if (!options.ignoreSort) {
+    const rawSort = map.get('sort');
+    if (rawSort) {
+      const [field, dir] = rawSort.split(',');
+      if (field) sort = [{ field, direction: dir === 'desc' ? 'desc' : 'asc' }];
+    }
   }
 
   const filters: Record<string, string> = {};

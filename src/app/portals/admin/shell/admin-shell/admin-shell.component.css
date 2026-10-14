@@ -4,7 +4,8 @@
 
 .shell {
   --_topbar: var(--fk-topbar-height);
-  min-height: 100dvh;
+  /* Lock to viewport so the sidebar stays visible; .content becomes the scroll region. */
+  height: 100dvh;
   display: grid;
   grid-template-columns: var(--fk-sidebar-width) 1fr;
   grid-template-rows: var(--_topbar) 1fr;
@@ -12,6 +13,7 @@
     'topbar topbar'
     'sidenav content';
   background: var(--fk-surface-muted);
+  overflow: hidden;
 }
 
 .shell__progress {
@@ -199,7 +201,9 @@
 .content {
   grid-area: content;
   overflow-x: hidden;
+  overflow-y: auto;
   outline: none;
+  min-height: 0; /* Needed for the child to be constrained in a grid cell. */
 }
 
 .shell__scrim {

@@ -8,6 +8,17 @@ import { paramsToQuery, queryToParams } from './list-url.util';
 export interface ConnectListToUrlOptions {
   /** Filter keys to read from / write to the URL for this list. */
   readonly filterKeys?: readonly string[];
+  /**
+   * Omit the `size` param from the URL (default size always applies on load).
+   * Defaults to `true` — on reload, every list starts at its initial page size.
+   * Set to `false` only if a caller explicitly wants URL-persisted size.
+   */
+  readonly omitSize?: boolean;
+  /**
+   * Omit the `sort` param from the URL (default sort always applies on load).
+   * Defaults to `true`. Set to `false` for shareable-sort-order views.
+   */
+  readonly omitSort?: boolean;
 }
 
 /**
@@ -29,21 +40,30 @@ export function connectListToUrl<T>(
   const destroyRef = inject(DestroyRef);
   const filterKeys = options.filterKeys ?? [];
   const defaultSize = feature.initialState.query.size;
+  const { omitSize = true, omitSort = true } = options;
 
   const initialQuery = paramsToQuery(
     route.snapshot.queryParamMap,
     feature.initialState.query,
     filterKeys,
+    { ignoreSize: omitSize, ignoreSort: omitSort },
   );
   store.dispatch(feature.actions.querySetFromUrl({ query: initialQuery }));
 
-  let lastSerialized = JSON.stringify(queryToParams(initialQuery, defaultSize));
+  const serialize = (query: typeof initialQuery) => {
+    const params = queryToParams(query, defaultSize);
+    if (omitSize) delete params['size'];
+    if (omitSort) delete params['sort'];
+    return params;
+  };
+
+  let lastSerialized = JSON.stringify(serialize(initialQuery));
 
   store
     .select(feature.selectors.selectQuery)
     .pipe(takeUntilDestroyed(destroyRef))
     .subscribe((query) => {
-      const params = queryToParams(query, defaultSize);
+      const params = serialize(query);
       const serialized = JSON.stringify(params);
       if (serialized === lastSerialized) return;
       lastSerialized = serialized;

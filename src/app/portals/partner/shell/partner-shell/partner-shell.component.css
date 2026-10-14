@@ -3,7 +3,8 @@
 }
 
 .shell {
-  min-height: 100dvh;
+  /* Lock to viewport so the topbar + rail stay visible; .content scrolls. */
+  height: 100dvh;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: var(--fk-topbar-height) 1fr;
@@ -11,6 +12,7 @@
     'topbar'
     'content';
   background: var(--fk-surface-muted);
+  overflow: hidden;
 }
 
 .shell__progress {
@@ -131,7 +133,9 @@
 .content {
   grid-area: content;
   overflow-x: hidden;
+  overflow-y: auto;
   outline: none;
+  min-height: 0;
   padding-bottom: var(--fk-space-16);
 }
 
