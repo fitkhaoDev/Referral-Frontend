@@ -26,46 +26,5 @@
       }
     </section>
 
-    <section class="panel">
-      <h2>Change password</h2>
-      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
-        @if (genericError(); as msg) {
-          <app-alert tone="error" title="Could not update password">{{ msg }}</app-alert>
-        }
-
-        <app-text-field
-          [control]="form.controls.currentPassword"
-          label="Current password"
-          type="password"
-          autocomplete="current-password"
-          requiredMark
-        ></app-text-field>
-
-        <app-text-field
-          [control]="form.controls.newPassword"
-          label="New password"
-          type="password"
-          autocomplete="new-password"
-          hint="At least 8 chars with an uppercase, a lowercase, a number and a special symbol (! @ # $ % ^ & * _ - + = ?)."
-          [errors]="{ weakPassword: 'Password needs: ' + weakHint() + '.' }"
-          requiredMark
-        ></app-text-field>
-
-        <app-text-field
-          [control]="form.controls.confirmPassword"
-          label="Confirm new password"
-          type="password"
-          autocomplete="new-password"
-          [errors]="{ mismatch: 'Passwords do not match.' }"
-          requiredMark
-        ></app-text-field>
-
-        <app-button type="submit" [loading]="busy()">Update password</app-button>
-      </form>
-      <p class="muted note">
-        The temporary/previous password is never shown to anyone. The backend enforces the
-        authoritative password policy.
-      </p>
-    </section>
   </div>
 </section>
