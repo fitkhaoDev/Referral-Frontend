@@ -27,12 +27,16 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    const isPublicAuthCall = /\/auth\/(login|refresh)$/.test(req.url);
+    const isPublicAuthCall = /\/auth\/(login|refresh|unified-login)$/.test(req.url);
     if (isPublicAuthCall || req.headers.has('Authorization')) {
       return next.handle(req);
     }
 
-    const audience = this.tokens.audienceForUrl(req.url);
+    // Attach a bearer to every authenticated API call. Prefer the audience
+    // implied by the URL (`/adm/**` → admin, `/partner/**` → partner); for
+    // audience-agnostic routes (`/me/**`, `/public/**`) use whichever session
+    // the user currently has.
+    const audience = this.tokens.audienceForUrl(req.url) ?? this.tokens.anyAudience();
     const bearer = audience ? this.tokens.bearerFor(audience) : null;
     if (!bearer) {
       return next.handle(req);

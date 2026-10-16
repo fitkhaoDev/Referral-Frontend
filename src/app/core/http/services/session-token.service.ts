@@ -18,10 +18,27 @@ export class SessionTokenService {
     initialValue: null,
   });
 
-  /** Infer the audience a request targets from its URL. */
+  /**
+   * Infer the audience a request targets from its URL. Returns null when the
+   * URL isn't audience-scoped (e.g. `/api/public/**`, `/api/me/**`) — in that
+   * case the interceptor falls back to {@link anyAudience}.
+   */
   audienceForUrl(url: string): Audience | null {
-    if (/\/admin(\/|$|\?)/.test(url)) return 'admin';
+    // Admin backend uses `/adm/` prefix; the frontend path is `/admin/`.
+    if (/\/(adm|admin)(\/|$|\?)/.test(url)) return 'admin';
     if (/\/partner(\/|$|\?)/.test(url)) return 'partner';
+    return null;
+  }
+
+  /**
+   * Returns whichever audience currently has a valid session, preferring the
+   * active portal. Used by the interceptor so that routes that don't fit a
+   * known audience prefix (e.g. `/me/*`, `/public/*`) still receive the token
+   * of the logged-in user.
+   */
+  anyAudience(): Audience | null {
+    if (this.partnerSession()) return 'partner';
+    if (this.adminSession()) return 'admin';
     return null;
   }
 
