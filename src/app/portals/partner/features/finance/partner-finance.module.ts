@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { SharedModule } from '@shared/shared.module';
 import { BankAccountFormDialogComponent } from './components/bank-account-form-dialog/bank-account-form-dialog.component';
+import { UpiFormDialogComponent } from './components/upi-form-dialog/upi-form-dialog.component';
 import { WithdrawDialogComponent } from './components/withdraw-dialog/withdraw-dialog.component';
 import { PartnerProfilePageComponent } from './pages/partner-profile-page/partner-profile-page.component';
 import { PartnerWalletPageComponent } from './pages/partner-wallet-page/partner-wallet-page.component';
@@ -24,6 +25,7 @@ const routes: Route[] = [
     PartnerWithdrawalsPageComponent,
     PartnerProfilePageComponent,
     BankAccountFormDialogComponent,
+    UpiFormDialogComponent,
     WithdrawDialogComponent,
   ],
 })

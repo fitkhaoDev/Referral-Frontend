@@ -1,0 +1,85 @@
+<app-dialog-shell
+  title="Add UPI"
+  subtitle="We verify the UPI handle is registered in your name. No money is moved."
+  (dismissed)="cancel()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+    @if (error(); as msg) {
+      <app-alert tone="error" title="Could not add UPI">{{ msg }}</app-alert>
+    }
+
+    @if (verificationFailure(); as fail) {
+      <app-alert tone="error" title="UPI verification failed">
+        <p>{{ fail.reason }}</p>
+        @if (fail.bankReturnedName) {
+          <p class="verify-detail">
+            Registered name on this UPI:
+            <strong>{{ fail.bankReturnedName }}</strong>
+          </p>
+          <p class="verify-detail">
+            Expected: <strong>{{ registeredName() }}</strong>
+            @if (fail.similarity !== undefined) {
+              (match score {{ fail.similarity | number: '1.0-2' }})
+            }
+          </p>
+          <p class="verify-hint">
+            The UPI must be registered under your account name. Try a different UPI handle or
+            contact support if your legal name on bank records differs.
+          </p>
+        }
+      </app-alert>
+    }
+
+    <label class="field">
+      <span class="field__label">Nickname (e.g. GPay, Paytm)</span>
+      <input type="text" formControlName="nickname" maxlength="40" />
+      @if (form.controls.nickname.touched && form.controls.nickname.invalid) {
+        <span class="field__err">
+          @if (form.controls.nickname.errors?.['required']) { Nickname is required. }
+          @else if (form.controls.nickname.errors?.['minlength']) { At least 2 characters. }
+          @else if (form.controls.nickname.errors?.['maxlength']) { Max 40 characters. }
+        </span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">UPI ID</span>
+      <input
+        type="text"
+        formControlName="vpa"
+        placeholder="name@bank"
+        autocomplete="off"
+        style="text-transform: lowercase"
+      />
+      <span class="field__hint">
+        We'll verify this is registered to <strong>{{ registeredName() }}</strong>.
+      </span>
+      @if (form.controls.vpa.touched && form.controls.vpa.invalid) {
+        <span class="field__err">
+          @if (form.controls.vpa.errors?.['required']) { UPI ID is required. }
+          @else if (form.controls.vpa.errors?.['pattern']) { Enter a valid UPI ID (e.g. name&#64;okaxis). }
+        </span>
+      }
+    </label>
+
+    <label class="row">
+      <input type="checkbox" formControlName="makePrimary" />
+      <span>Make this my primary UPI</span>
+    </label>
+
+    <label class="field">
+      <span class="field__label">Confirm your current password</span>
+      <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+      @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
+        <span class="field__err">Please enter your current password.</span>
+      }
+    </label>
+  </form>
+
+  <div footer>
+    <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
+    <app-button [loading]="submitting()" (pressed)="submit()">
+      {{ submitting() ? 'Verifying…' : verificationFailure() ? 'Try again' : 'Add UPI' }}
+    </app-button>
+  </div>
+</app-dialog-shell>

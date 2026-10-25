@@ -35,6 +35,34 @@ export interface AddBankAccountPayload {
 }
 export type EditBankAccountPayload = AddBankAccountPayload;
 
+export interface PartnerUpi {
+  readonly id: string;
+  readonly nickname: string;
+  readonly accountHolder: string;
+  readonly vpa: string;
+  readonly isPrimary: boolean;
+  readonly verificationStatus: BankVerificationStatus;
+  readonly verifiedAt?: IsoDateTime;
+  readonly verificationFailureReason?: string;
+  readonly bankReturnedName?: string;
+  readonly nameMatchSimilarity?: number;
+  readonly createdAt: IsoDateTime;
+  readonly updatedAt: IsoDateTime;
+}
+
+export interface PartnerUpiList {
+  readonly accounts: readonly PartnerUpi[];
+  readonly monthlyAddEditCount: number;
+  readonly monthlyAddEditLimit: number;
+}
+
+export interface AddUpiPayload {
+  readonly nickname: string;
+  readonly vpa: string;
+  readonly makePrimary: boolean;
+  readonly currentPassword: string;
+}
+
 /**
  * Union of the individual-partner and organisation profile shapes returned
  * by `GET /api/partner/me/profile`. Backend returns one or the other
@@ -103,19 +131,31 @@ export const PARTNER_WITHDRAWAL_STATUS_LABEL: Record<PartnerWithdrawalStatus, st
   FAILED: 'Failed',
 };
 
+export type WithdrawalDestinationType = 'BANK' | 'UPI';
+
 export interface PartnerWithdrawal {
   readonly id: string;
   readonly reference: string;
   readonly status: PartnerWithdrawalStatus;
+  readonly destinationType: WithdrawalDestinationType;
   readonly amount: Money;
   readonly convenienceCharge: Money;
   readonly totalDebit: Money;
-  readonly bankSnapshot: {
+  /** Pre-formatted destination label from the backend DTO. */
+  readonly payoutDestination?: string;
+  /** 'BANK_TRANSFER' | 'UPI'. */
+  readonly payoutMethod?: string;
+  readonly bankSnapshot?: {
     nickname: string;
     accountHolder: string;
     accountNumberLast4: string;
     ifsc: string;
     bankName: string;
+  };
+  readonly upiSnapshot?: {
+    nickname: string;
+    accountHolder: string;
+    vpa: string;
   };
   readonly requestedAt: IsoDateTime;
   readonly paidAt?: IsoDateTime;
@@ -123,6 +163,13 @@ export interface PartnerWithdrawal {
   readonly failedAt?: IsoDateTime;
   readonly failureReason?: string;
   readonly cancelledAt?: IsoDateTime;
+}
+
+export interface RequestWithdrawalPayload {
+  readonly amount: number;
+  readonly destinationType: WithdrawalDestinationType;
+  readonly destinationId: string;
+  readonly requesterNote?: string;
 }
 
 export interface PartnerWithdrawalPage {

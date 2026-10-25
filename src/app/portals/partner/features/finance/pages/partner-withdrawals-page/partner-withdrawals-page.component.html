@@ -26,8 +26,15 @@
               <td class="fk-num">{{ w.convenienceCharge | money }}</td>
               <td>
                 <div class="dest">
-                  <span>{{ w.bankSnapshot.nickname }}</span>
-                  <span class="dest__bank">{{ w.bankSnapshot.bankName }} ••••{{ w.bankSnapshot.accountNumberLast4 }}</span>
+                  @if (w.destinationType === 'UPI' && w.upiSnapshot) {
+                    <span>{{ w.upiSnapshot.nickname }}</span>
+                    <span class="dest__bank">UPI · {{ w.upiSnapshot.vpa }}</span>
+                  } @else if (w.bankSnapshot) {
+                    <span>{{ w.bankSnapshot.nickname }}</span>
+                    <span class="dest__bank">{{ w.bankSnapshot.bankName }} ••••{{ w.bankSnapshot.accountNumberLast4 }}</span>
+                  } @else {
+                    <span>{{ w.payoutDestination ?? '—' }}</span>
+                  }
                 </div>
               </td>
               <td>

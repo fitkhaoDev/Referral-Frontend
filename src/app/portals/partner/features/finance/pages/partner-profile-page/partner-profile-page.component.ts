@@ -5,14 +5,17 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { catchError, of, tap } from 'rxjs';
 import { NotificationService } from '@core/notifications/notification.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { BankAccountFormDialogComponent } from '../../components/bank-account-form-dialog/bank-account-form-dialog.component';
+import { UpiFormDialogComponent } from '../../components/upi-form-dialog/upi-form-dialog.component';
 import { PartnerFinanceApi } from '../../data-access/partner-finance-api.service';
 import {
-  PartnerBankAccount,
-  PartnerBankAccountList,
   PartnerProfile,
+  PartnerUpi,
+  PartnerUpiList,
 } from '../../models/finance.model';
 
+// NOTE: Bank-account add/edit UI is temporarily hidden. The backend
+// bank-account endpoints are still wired for future reactivation. For now
+// payouts are routed exclusively through UPI (zero vendor fee).
 @Component({
   selector: 'app-partner-profile-page',
   standalone: false,
@@ -28,7 +31,7 @@ export class PartnerProfilePageComponent {
   private readonly fb = inject(FormBuilder);
 
   protected readonly profile = signal<PartnerProfile | null>(null);
-  protected readonly bankData = signal<PartnerBankAccountList | null>(null);
+  protected readonly upiData = signal<PartnerUpiList | null>(null);
   protected readonly editing = signal(false);
   protected readonly savingProfile = signal(false);
 
@@ -45,9 +48,9 @@ export class PartnerProfilePageComponent {
     { initialValue: null },
   );
 
-  private readonly _bootstrapBanks = toSignal(
-    this.api.listBankAccounts().pipe(
-      tap((d) => this.bankData.set(d)),
+  protected readonly bootstrapUpi = toSignal(
+    this.api.listUpi().pipe(
+      tap((d) => this.upiData.set(d)),
       catchError(() => of(null)),
     ),
     { initialValue: null },
@@ -106,67 +109,55 @@ export class PartnerProfilePageComponent {
       });
   }
 
-  protected refreshBanks(): void {
+  protected refreshUpi(): void {
     this.api
-      .listBankAccounts()
+      .listUpi()
       .pipe(catchError(() => of(null)))
-      .subscribe((d) => this.bankData.set(d));
+      .subscribe((d) => this.upiData.set(d));
   }
 
-  protected addBank(): void {
-    const ref = this.dialog.open<boolean | undefined>(BankAccountFormDialogComponent, {
+  protected addUpi(): void {
+    const ref = this.dialog.open<boolean | undefined>(UpiFormDialogComponent, {
       data: { mode: 'add' },
       panelClass: 'fk-dialog-panel',
       width: 'min(560px, 95vw)',
       autoFocus: 'dialog',
     });
     ref.closed.subscribe((changed) => {
-      if (changed) this.refreshBanks();
+      if (changed) this.refreshUpi();
     });
   }
 
-  protected editBank(acc: PartnerBankAccount): void {
-    const ref = this.dialog.open<boolean | undefined>(BankAccountFormDialogComponent, {
-      data: { mode: 'edit', account: acc },
-      panelClass: 'fk-dialog-panel',
-      width: 'min(560px, 95vw)',
-      autoFocus: 'dialog',
-    });
-    ref.closed.subscribe((changed) => {
-      if (changed) this.refreshBanks();
-    });
-  }
-
-  protected makePrimary(acc: PartnerBankAccount): void {
-    this.api.makePrimary(acc.id).subscribe({
+  protected makePrimary(acc: PartnerUpi): void {
+    this.api.makeUpiPrimary(acc.id).subscribe({
       next: () => {
-        this.notifications.success(`${acc.nickname} is now your primary account.`);
-        this.refreshBanks();
+        this.notifications.success(`${acc.nickname} is now your primary UPI.`);
+        this.refreshUpi();
       },
       error: (err) => this.notifications.error(err?.message ?? 'Could not update primary.'),
     });
   }
 
-  protected async deleteBank(acc: PartnerBankAccount): Promise<void> {
+  protected async deleteUpi(acc: PartnerUpi): Promise<void> {
     const ok = await this.confirm.confirm({
       title: `Delete "${acc.nickname}"?`,
-      message: 'The account will be removed. In-flight withdrawals are not affected.',
+      message: 'The UPI will be removed. In-flight withdrawals are not affected.',
       confirmLabel: 'Delete',
       tone: 'danger',
     });
     if (!ok) return;
     const pwd = window.prompt('Please re-enter your password to confirm deletion.');
     if (!pwd) return;
-    this.api.deleteBankAccount(acc.id, pwd).subscribe({
+    this.api.deleteUpi(acc.id, pwd).subscribe({
       next: () => {
-        this.notifications.success('Bank account deleted.');
-        this.refreshBanks();
+        this.notifications.success('UPI deleted.');
+        this.refreshUpi();
       },
       error: (err) => this.notifications.error(err?.message ?? 'Could not delete.'),
     });
   }
 
-  protected tone(status: PartnerBankAccount['verificationStatus']): 'success' | 'warning' | 'danger' {
+  protected tone(status: PartnerUpi['verificationStatus']): 'success' | 'warning' | 'danger' {
     switch (status) {
       case 'VERIFIED':
         return 'success';
@@ -176,7 +167,7 @@ export class PartnerProfilePageComponent {
         return 'danger';
     }
   }
-  protected statusLabel(status: PartnerBankAccount['verificationStatus']): string {
+  protected statusLabel(status: PartnerUpi['verificationStatus']): string {
     switch (status) {
       case 'VERIFIED':
         return 'Verified';

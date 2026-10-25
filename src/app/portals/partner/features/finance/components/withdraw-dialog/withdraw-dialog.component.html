@@ -1,11 +1,11 @@
 <app-dialog-shell
-  title="Withdraw to your bank"
+  title="Withdraw"
   [subtitle]="wallet() ? ('Available ' + (wallet()!.withdrawable | money)) : ''"
   (dismissed)="cancel()"
 >
-  @if (verifiedBanks().length === 0) {
-    <app-alert tone="warning" title="No verified bank account">
-      Please add and verify a bank account from your Profile before withdrawing.
+  @if (!hasDestinations()) {
+    <app-alert tone="warning" title="No verified payout destination">
+      Please add and verify a bank account or UPI from your Profile before withdrawing.
     </app-alert>
   } @else if (wallet()?.suspended) {
     <app-alert tone="warning" title="Withdrawals disabled">
@@ -13,15 +13,45 @@
     </app-alert>
   } @else {
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+      <div class="field">
+        <span class="field__label">Payout method</span>
+        <div class="toggle" role="radiogroup" aria-label="Payout method">
+          <label class="toggle__opt" [class.toggle__opt--active]="!isUpi()">
+            <input
+              type="radio"
+              formControlName="destinationType"
+              value="BANK"
+              [disabled]="verifiedBanks().length === 0"
+            />
+            <span>Bank transfer</span>
+          </label>
+          <label class="toggle__opt" [class.toggle__opt--active]="isUpi()">
+            <input
+              type="radio"
+              formControlName="destinationType"
+              value="UPI"
+              [disabled]="verifiedUpis().length === 0"
+            />
+            <span>UPI</span>
+          </label>
+        </div>
+      </div>
+
       <label class="field">
         <span class="field__label">Destination</span>
-        <select formControlName="bankAccountId">
-          @for (b of verifiedBanks(); track b.id) {
-            <option [value]="b.id">
-              {{ b.nickname }} — {{ b.bankName }} ••••{{ b.accountNumberLast4 }}{{ b.isPrimary ? ' (Primary)' : '' }}
-            </option>
-          }
-        </select>
+        @if (filteredDestinations().length === 0) {
+          <span class="field__hint">
+            No verified {{ isUpi() ? 'UPI handles' : 'bank accounts' }}. Add one from your Profile.
+          </span>
+        } @else {
+          <select formControlName="destinationId">
+            @for (d of filteredDestinations(); track d.id) {
+              <option [value]="d.id">
+                {{ d.label }}{{ d.isPrimary ? ' (Primary)' : '' }}
+              </option>
+            }
+          </select>
+        }
       </label>
 
       <label class="field">
@@ -32,6 +62,16 @@
           [min]="majorUnits(wallet()?.minWithdrawal)"
           [max]="majorUnits(wallet()?.withdrawable)"
         />
+        @if (isUpi()) {
+          <span class="field__hint">
+            UPI limit: ₹{{ upiCapRupees | number: '1.0-0' }} per transaction.
+          </span>
+        }
+        @if (upiCapExceeded()) {
+          <span class="field__err">
+            UPI payouts are capped at ₹{{ upiCapRupees | number: '1.0-0' }} per transaction. Use a bank account for higher amounts.
+          </span>
+        }
       </label>
 
       @if (quote(); as q) {
@@ -54,7 +94,7 @@
 
   <div footer>
     <app-button variant="secondary" (pressed)="cancel()">Cancel</app-button>
-    @if (verifiedBanks().length > 0 && !wallet()?.suspended) {
+    @if (hasDestinations() && !wallet()?.suspended) {
       <app-button [loading]="submitting()" (pressed)="submit()">
         Withdraw
       </app-button>

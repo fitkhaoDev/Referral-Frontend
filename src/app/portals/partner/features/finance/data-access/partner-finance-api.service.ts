@@ -5,14 +5,19 @@ import { map } from 'rxjs/operators';
 import { APP_CONFIG } from '@core/config/app-config.token';
 import {
   AddBankAccountPayload,
+  AddUpiPayload,
   EditBankAccountPayload,
   PartnerBankAccount,
   PartnerBankAccountList,
   PartnerProfile,
+  PartnerUpi,
+  PartnerUpiList,
   PartnerWalletSummary,
   PartnerWithdrawal,
   PartnerWithdrawalPage,
+  RequestWithdrawalPayload,
   UpdatePartnerProfilePayload,
+  WithdrawalDestinationType,
   WithdrawalQuote,
 } from '../models/finance.model';
 
@@ -59,13 +64,36 @@ export class PartnerFinanceApi {
     }).pipe(map(() => void 0));
   }
 
+  // ─ UPI ───────────────────────────────────────────────────────────────────
+  listUpi(): Observable<PartnerUpiList> {
+    return this.http.get<any>(`${this.base}/upi`).pipe(map((res) => res.data));
+  }
+  addUpi(payload: AddUpiPayload): Observable<PartnerUpi> {
+    return this.http.post<any>(`${this.base}/upi`, payload).pipe(map((res) => res.data));
+  }
+  makeUpiPrimary(id: string): Observable<PartnerUpi> {
+    return this.http
+      .post<any>(`${this.base}/upi/${id}/make-primary`, {})
+      .pipe(map((res) => res.data));
+  }
+  deleteUpi(id: string, currentPassword: string): Observable<void> {
+    return this.http
+      .request<any>('delete', `${this.base}/upi/${id}`, { body: { currentPassword } })
+      .pipe(map(() => void 0));
+  }
+
   // ─ Wallet + withdrawals ──────────────────────────────────────────────────
   wallet(): Observable<PartnerWalletSummary> {
     return this.http.get<any>(`${this.base}/wallet`).pipe(map((res) => res.data));
   }
 
-  quote(amount: number): Observable<WithdrawalQuote> {
-    const params = new HttpParams().set('amount', String(amount));
+  quote(
+    amount: number,
+    destinationType: WithdrawalDestinationType = 'BANK',
+  ): Observable<WithdrawalQuote> {
+    const params = new HttpParams()
+      .set('amount', String(amount))
+      .set('destinationType', destinationType);
     return this.http
       .get<any>(`${this.base}/withdrawals-quote`, { params })
       .pipe(map((res) => res.data));
@@ -78,7 +106,7 @@ export class PartnerFinanceApi {
       .pipe(map((res) => res.data));
   }
 
-  requestWithdrawal(payload: { amount: number; bankAccountId: string; requesterNote?: string }): Observable<PartnerWithdrawal> {
+  requestWithdrawal(payload: RequestWithdrawalPayload): Observable<PartnerWithdrawal> {
     return this.http
       .post<any>(`${this.base}/withdrawals`, payload)
       .pipe(map((res) => res.data));
