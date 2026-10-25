@@ -23,6 +23,24 @@
 .actions-none {
   margin: 0 0 var(--fk-space-6);
 }
+.dev-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fk-space-3);
+  margin: 0 0 var(--fk-space-6);
+  padding: var(--fk-space-3);
+  border: 1px dashed var(--fk-warning, #c0a000);
+  border-radius: var(--fk-radius-md);
+  background: color-mix(in srgb, var(--fk-warning, #c0a000) 8%, transparent);
+}
+.dev-actions__label {
+  font-size: var(--fk-text-xs);
+  font-weight: var(--fk-weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fk-warning, #c0a000);
+}
 
 section {
   margin-bottom: var(--fk-space-6);

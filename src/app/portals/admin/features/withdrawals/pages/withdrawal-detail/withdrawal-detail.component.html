@@ -40,6 +40,28 @@
       <p class="muted actions-none">No actions available — this withdrawal is {{ statusLabelOf(w.status) | lowercase }}.</p>
     }
 
+    @if (simulatorAvailable && w.status === 'PROCESSING') {
+      <div class="dev-actions" role="group" aria-label="Test webhook simulator">
+        <span class="dev-actions__label">TEST ONLY</span>
+        <app-button
+          variant="secondary"
+          [loading]="simulating() === 'PAID'"
+          [disabled]="simulating() !== null"
+          (pressed)="simulate('PAID')"
+        >
+          Simulate PAID webhook
+        </app-button>
+        <app-button
+          variant="danger"
+          [loading]="simulating() === 'FAILED'"
+          [disabled]="simulating() !== null"
+          (pressed)="simulate('FAILED')"
+        >
+          Simulate FAILED webhook
+        </app-button>
+      </div>
+    }
+
     <section aria-label="Attribution">
       <h2>Attribution</h2>
       <dl class="detail">
