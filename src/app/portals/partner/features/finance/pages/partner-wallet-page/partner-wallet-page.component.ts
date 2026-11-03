@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { catchError, defer, map, of } from 'rxjs';
 import { PartnerFinanceApi } from '../../data-access/partner-finance-api.service';
-import { PartnerWalletSummary } from '../../models/finance.model';
+import { PartnerWalletSummary, WithdrawalRequestStatus } from '../../models/finance.model';
 import { WithdrawDialogComponent } from '../../components/withdraw-dialog/withdraw-dialog.component';
 
 @Component({
@@ -28,7 +28,7 @@ export class PartnerWalletPageComponent {
   );
 
   protected readonly recentWithdrawals = toSignal(
-    defer(() => this.api.listWithdrawals(0, 5)).pipe(
+    defer(() => this.api.listWithdrawalRequests(0, 5)).pipe(
       map((p) => p.items),
       catchError(() => of([])),
     ),
@@ -46,6 +46,24 @@ export class PartnerWalletPageComponent {
 
   protected goToWithdrawals(): void {
     void this.router.navigate(['/partner/withdrawals']);
+  }
+
+  protected readonly statusLabel: Record<WithdrawalRequestStatus, string> = {
+    PENDING: 'Pending',
+    SUCCESS: 'Success',
+    FAILED: 'Failed',
+  };
+
+  protected statusTone(status: WithdrawalRequestStatus): 'success' | 'warning' | 'danger' {
+    switch (status) {
+      case 'SUCCESS':
+        return 'success';
+      case 'FAILED':
+        return 'danger';
+      case 'PENDING':
+      default:
+        return 'warning';
+    }
   }
 
   protected canWithdraw(): boolean {

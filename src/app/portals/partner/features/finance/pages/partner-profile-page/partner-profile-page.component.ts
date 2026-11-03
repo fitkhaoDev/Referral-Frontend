@@ -5,17 +5,19 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { catchError, of, tap } from 'rxjs';
 import { NotificationService } from '@core/notifications/notification.service';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { UpiFormDialogComponent } from '../../components/upi-form-dialog/upi-form-dialog.component';
+import { BankAccountFormDialogComponent } from '../../components/bank-account-form-dialog/bank-account-form-dialog.component';
 import { PartnerFinanceApi } from '../../data-access/partner-finance-api.service';
 import {
+  PartnerBankAccount,
+  PartnerBankAccountList,
   PartnerProfile,
-  PartnerUpi,
-  PartnerUpiList,
 } from '../../models/finance.model';
 
-// NOTE: Bank-account add/edit UI is temporarily hidden. The backend
-// bank-account endpoints are still wired for future reactivation. For now
-// payouts are routed exclusively through UPI (zero vendor fee).
+// NOTE: UPI payout destinations are temporarily disabled. The code is retained
+// in the module for future reactivation; manual-approval withdrawals currently
+// run exclusively through bank-account transfers. Partners can keep multiple
+// bank accounts and designate one as the default — the admin reads that
+// default when actioning a request.
 @Component({
   selector: 'app-partner-profile-page',
   standalone: false,
@@ -31,7 +33,7 @@ export class PartnerProfilePageComponent {
   private readonly fb = inject(FormBuilder);
 
   protected readonly profile = signal<PartnerProfile | null>(null);
-  protected readonly upiData = signal<PartnerUpiList | null>(null);
+  protected readonly bankData = signal<PartnerBankAccountList | null>(null);
   protected readonly editing = signal(false);
   protected readonly savingProfile = signal(false);
 
@@ -40,7 +42,7 @@ export class PartnerProfilePageComponent {
     professionalAddress: ['', [Validators.maxLength(240)]],
   });
 
-  private readonly _bootstrapProfile = toSignal(
+  protected readonly bootstrapProfile = toSignal(
     this.api.getMyProfile().pipe(
       tap((p) => this.hydrate(p)),
       catchError(() => of(null)),
@@ -48,9 +50,9 @@ export class PartnerProfilePageComponent {
     { initialValue: null },
   );
 
-  protected readonly bootstrapUpi = toSignal(
-    this.api.listUpi().pipe(
-      tap((d) => this.upiData.set(d)),
+  protected readonly bootstrapBanks = toSignal(
+    this.api.listBankAccounts().pipe(
+      tap((d) => this.bankData.set(d)),
       catchError(() => of(null)),
     ),
     { initialValue: null },
@@ -109,55 +111,67 @@ export class PartnerProfilePageComponent {
       });
   }
 
-  protected refreshUpi(): void {
+  protected refreshBanks(): void {
     this.api
-      .listUpi()
+      .listBankAccounts()
       .pipe(catchError(() => of(null)))
-      .subscribe((d) => this.upiData.set(d));
+      .subscribe((d) => this.bankData.set(d));
   }
 
-  protected addUpi(): void {
-    const ref = this.dialog.open<boolean | undefined>(UpiFormDialogComponent, {
+  protected addBank(): void {
+    const ref = this.dialog.open<boolean | undefined>(BankAccountFormDialogComponent, {
       data: { mode: 'add' },
       panelClass: 'fk-dialog-panel',
       width: 'min(560px, 95vw)',
       autoFocus: 'dialog',
     });
     ref.closed.subscribe((changed) => {
-      if (changed) this.refreshUpi();
+      if (changed) this.refreshBanks();
     });
   }
 
-  protected makePrimary(acc: PartnerUpi): void {
-    this.api.makeUpiPrimary(acc.id).subscribe({
+  protected editBank(acc: PartnerBankAccount): void {
+    const ref = this.dialog.open<boolean | undefined>(BankAccountFormDialogComponent, {
+      data: { mode: 'edit', account: acc },
+      panelClass: 'fk-dialog-panel',
+      width: 'min(560px, 95vw)',
+      autoFocus: 'dialog',
+    });
+    ref.closed.subscribe((changed) => {
+      if (changed) this.refreshBanks();
+    });
+  }
+
+  protected makeDefault(acc: PartnerBankAccount): void {
+    this.api.makePrimary(acc.id).subscribe({
       next: () => {
-        this.notifications.success(`${acc.nickname} is now your primary UPI.`);
-        this.refreshUpi();
+        this.notifications.success(`${acc.nickname} is now your default account.`);
+        this.refreshBanks();
       },
-      error: (err) => this.notifications.error(err?.message ?? 'Could not update primary.'),
+      error: (err) => this.notifications.error(err?.message ?? 'Could not update default.'),
     });
   }
 
-  protected async deleteUpi(acc: PartnerUpi): Promise<void> {
+  protected async deleteBank(acc: PartnerBankAccount): Promise<void> {
     const ok = await this.confirm.confirm({
       title: `Delete "${acc.nickname}"?`,
-      message: 'The UPI will be removed. In-flight withdrawals are not affected.',
+      message: 'The account will be removed. In-flight withdrawals are not affected.',
       confirmLabel: 'Delete',
       tone: 'danger',
     });
     if (!ok) return;
     const pwd = window.prompt('Please re-enter your password to confirm deletion.');
     if (!pwd) return;
-    this.api.deleteUpi(acc.id, pwd).subscribe({
+    this.api.deleteBankAccount(acc.id, pwd).subscribe({
       next: () => {
-        this.notifications.success('UPI deleted.');
-        this.refreshUpi();
+        this.notifications.success('Bank account deleted.');
+        this.refreshBanks();
       },
       error: (err) => this.notifications.error(err?.message ?? 'Could not delete.'),
     });
   }
 
-  protected tone(status: PartnerUpi['verificationStatus']): 'success' | 'warning' | 'danger' {
+  protected tone(status: PartnerBankAccount['verificationStatus']): 'success' | 'warning' | 'danger' {
     switch (status) {
       case 'VERIFIED':
         return 'success';
@@ -167,7 +181,7 @@ export class PartnerProfilePageComponent {
         return 'danger';
     }
   }
-  protected statusLabel(status: PartnerUpi['verificationStatus']): string {
+  protected statusLabel(status: PartnerBankAccount['verificationStatus']): string {
     switch (status) {
       case 'VERIFIED':
         return 'Verified';

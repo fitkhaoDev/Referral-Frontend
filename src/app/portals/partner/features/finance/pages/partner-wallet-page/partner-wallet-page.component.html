@@ -44,9 +44,14 @@
       <ul class="recent">
         @for (r of recentWithdrawals(); track r.id) {
           <li class="recent__row">
-            <span class="recent__ref">{{ r.reference }}</span>
+            <span class="recent__ref">{{ r.requestId }}</span>
             <span class="recent__amount fk-num">{{ r.amount | money }}</span>
-            <span class="recent__status">{{ r.status }}</span>
+            <span class="recent__status">
+              <app-status-badge
+                [label]="statusLabel[r.status]"
+                [tone]="statusTone(r.status)"
+              ></app-status-badge>
+            </span>
             <span class="recent__when">{{ r.requestedAt | date: 'mediumDate' }}</span>
           </li>
         }

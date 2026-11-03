@@ -90,13 +90,11 @@ export class BankAccountFormDialogComponent {
     req.subscribe({
       next: (acc) => {
         this.submitting.set(false);
-        if (acc.verificationStatus === 'VERIFIED') {
-          this.notifications.success('Bank account verified.');
-        } else if (acc.verificationStatus === 'FAILED') {
-          this.notifications.error(acc.verificationFailureReason ?? 'Verification failed.');
-        } else {
-          this.notifications.info('Verification in progress.');
-        }
+        // Manual-approval flow: vendor verification is advisory. Always treat a
+        // successful save as success and hide vendor failure reasons; the record
+        // is kept in DB for when automated verification is reactivated.
+        void acc;
+        this.notifications.success(this.isEdit ? 'Bank account updated.' : 'Bank account added.');
         this.dialogRef.close(true);
       },
       error: (err) => {

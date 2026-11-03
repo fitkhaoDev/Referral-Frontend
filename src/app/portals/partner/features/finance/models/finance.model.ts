@@ -94,6 +94,48 @@ export interface UpdatePartnerProfilePayload {
   readonly professionalAddress?: string;
 }
 
+/* ─── Manual-approval withdrawal request ──────────────────────────────────── */
+
+export type WithdrawalRequestStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
+
+export interface WithdrawalRequest {
+  readonly id: string;
+  readonly requestId: string;
+  readonly ownerName: string;
+  readonly ownerRef: string;
+  readonly bankAccountId: string;
+  readonly bankSnapshot: {
+    nickname: string;
+    accountHolder: string;
+    accountNumberLast4: string;
+    ifsc: string;
+    bankName: string;
+  };
+  readonly amount: Money;
+  readonly status: WithdrawalRequestStatus;
+  readonly requestedAt: IsoDateTime;
+  readonly requesterNote?: string;
+  readonly actionedBy?: string;
+  readonly actionedAt?: IsoDateTime;
+  readonly transactionId?: string;
+  readonly adminComment?: string;
+  readonly failureReason?: string;
+}
+
+export interface WithdrawalRequestPage {
+  readonly items: readonly WithdrawalRequest[];
+  readonly page: number;
+  readonly size: number;
+  readonly totalItems: number;
+  readonly totalPages: number;
+}
+
+export interface CreateWithdrawalRequestPayload {
+  readonly amount: number;
+  readonly bankAccountId?: string;
+  readonly requesterNote?: string;
+}
+
 export interface PartnerWalletSummary {
   readonly available: Money;
   readonly pending: Money;

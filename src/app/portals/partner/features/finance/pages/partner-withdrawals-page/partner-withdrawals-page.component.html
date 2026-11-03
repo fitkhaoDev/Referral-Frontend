@@ -2,50 +2,46 @@
   <h1>Withdrawals</h1>
   @if (data(); as d) {
     @if (d.items.length === 0) {
-      <p class="muted">No withdrawals yet.</p>
+      <p class="muted">No withdrawal requests yet.</p>
     } @else {
       <table class="tbl">
         <thead>
           <tr>
-            <th>Reference</th>
+            <th>Request ID</th>
             <th class="fk-num">Amount</th>
-            <th class="fk-num">Fee</th>
-            <th>Destination</th>
+            <th>Credit to</th>
             <th>Status</th>
             <th>Requested</th>
-            <th>Paid</th>
-            <th>UTR</th>
-            <th></th>
+            <th>Actioned</th>
+            <th>Transaction / Reason</th>
           </tr>
         </thead>
         <tbody>
           @for (w of d.items; track w.id) {
             <tr>
-              <td><code>{{ w.reference }}</code></td>
+              <td><code>{{ w.requestId }}</code></td>
               <td class="fk-num">{{ w.amount | money }}</td>
-              <td class="fk-num">{{ w.convenienceCharge | money }}</td>
               <td>
                 <div class="dest">
-                  @if (w.destinationType === 'UPI' && w.upiSnapshot) {
-                    <span>{{ w.upiSnapshot.nickname }}</span>
-                    <span class="dest__bank">UPI · {{ w.upiSnapshot.vpa }}</span>
-                  } @else if (w.bankSnapshot) {
-                    <span>{{ w.bankSnapshot.nickname }}</span>
-                    <span class="dest__bank">{{ w.bankSnapshot.bankName }} ••••{{ w.bankSnapshot.accountNumberLast4 }}</span>
-                  } @else {
-                    <span>{{ w.payoutDestination ?? '—' }}</span>
-                  }
+                  <span>{{ w.bankSnapshot.nickname }}</span>
+                  <span class="dest__bank">
+                    {{ w.bankSnapshot.bankName }} ••••{{ w.bankSnapshot.accountNumberLast4 }}
+                  </span>
                 </div>
               </td>
               <td>
-                <app-status-badge [label]="label[w.status]" [tone]="tone(w.status)"></app-status-badge>
+                <app-status-badge [label]="statusLabel[w.status]" [tone]="tone(w.status)"></app-status-badge>
               </td>
               <td>{{ w.requestedAt | date: 'medium' }}</td>
-              <td>{{ w.paidAt ? (w.paidAt | date: 'medium') : '—' }}</td>
-              <td><code>{{ w.paymentReference ?? '—' }}</code></td>
+              <td>{{ w.actionedAt ? (w.actionedAt | date: 'medium') : '—' }}</td>
               <td>
-                @if (cancelable(w)) {
-                  <app-button variant="secondary" size="sm" (pressed)="cancel(w)">Cancel</app-button>
+                @if (w.status === 'SUCCESS' && w.transactionId) {
+                  <div><code>{{ w.transactionId }}</code></div>
+                  @if (w.adminComment) { <div class="muted small">{{ w.adminComment }}</div> }
+                } @else if (w.status === 'FAILED') {
+                  <div class="muted small">{{ w.failureReason ?? w.adminComment ?? '—' }}</div>
+                } @else {
+                  —
                 }
               </td>
             </tr>

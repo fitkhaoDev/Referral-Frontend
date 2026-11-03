@@ -74,7 +74,9 @@ const routes: Routes = [
         import('./features/wallets/wallets.module').then((m) => m.WalletsModule),
       ),
       feature('withdrawals', 'withdrawal:read', () =>
-        import('./features/withdrawals/withdrawals.module').then((m) => m.WithdrawalsModule),
+        import('./features/withdrawal-requests/withdrawal-requests.module').then(
+          (m) => m.WithdrawalRequestsModule,
+        ),
       ),
       feature('analytics', 'analytics:read', () =>
         import('./features/analytics/analytics.module').then((m) => m.AnalyticsModule),

@@ -1,0 +1,88 @@
+<section class="fk-page">
+  <h1>Withdrawal requests</h1>
+  <p class="sub muted">Partners raise requests; approve manually by transferring from the company bank account and recording the transaction here.</p>
+
+  <form [formGroup]="filters" class="filters" novalidate>
+    <label class="field field--grow">
+      <span class="field__label">Search</span>
+      <input type="text" formControlName="search" placeholder="Request ID, partner name or ID" />
+    </label>
+    <label class="field">
+      <span class="field__label">Status</span>
+      <select formControlName="status">
+        <option value="">All</option>
+        @for (s of STATUSES; track s) {
+          <option [value]="s">{{ STATUS_LABEL[s] }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span class="field__label">From</span>
+      <input type="date" formControlName="fromDate" />
+    </label>
+    <label class="field">
+      <span class="field__label">To</span>
+      <input type="date" formControlName="toDate" />
+    </label>
+    <app-button variant="secondary" size="sm" (pressed)="resetFilters()">Reset</app-button>
+  </form>
+
+  @if (data(); as d) {
+    @if (d.items.length === 0) {
+      <p class="muted empty">No requests match the current filters.</p>
+    } @else {
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Partner</th>
+              <th class="num">Amount</th>
+              <th>Default bank</th>
+              <th>Status</th>
+              <th>Requested</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of d.items; track r.id) {
+              <tr>
+                <td><code>{{ r.requestId }}</code></td>
+                <td>
+                  <div>{{ r.ownerName }}</div>
+                  <div class="muted small fk-num">{{ r.ownerRef }}</div>
+                </td>
+                <td class="num fk-num">{{ r.amount | money }}</td>
+                <td>
+                  <div>{{ r.bankSnapshot.bankName }} ••••{{ r.bankSnapshot.accountNumberLast4 }}</div>
+                  <div class="muted small">{{ r.bankSnapshot.ifsc }}</div>
+                </td>
+                <td>
+                  <app-status-badge [label]="STATUS_LABEL[r.status]" [tone]="tone(r.status)"></app-status-badge>
+                </td>
+                <td>{{ r.requestedAt | date: 'medium' }}</td>
+                <td>
+                  <app-button variant="secondary" size="sm" (pressed)="openDetail(r)">
+                    {{ r.status === 'PENDING' ? 'Review' : 'View' }}
+                  </app-button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="pager">
+        <app-button variant="secondary" size="sm" [disabled]="!canPrev()" (pressed)="prev()">Previous</app-button>
+        <span class="pager__info muted">
+          Page {{ d.page + 1 }} / {{ d.totalPages || 1 }} · {{ d.totalItems }} total
+        </span>
+        <app-button variant="secondary" size="sm" [disabled]="!canNext()" (pressed)="next()">Next</app-button>
+      </nav>
+    }
+  } @else if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else {
+    <p class="muted">Could not load requests.</p>
+  }
+</section>

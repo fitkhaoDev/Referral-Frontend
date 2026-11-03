@@ -1,0 +1,176 @@
+<app-dialog-shell
+  title="Withdrawal request"
+  [subtitle]="detail()?.requestId ?? ''"
+  (dismissed)="close()"
+>
+  @if (detail(); as d) {
+    <!-- Partner + request summary -->
+    <section class="section">
+      <div class="row">
+        <h3 class="section__title">Partner</h3>
+        <app-status-badge [label]="STATUS_LABEL[d.status]" [tone]="tone(d.status)"></app-status-badge>
+      </div>
+      <dl class="facts">
+        <div><dt>Name</dt><dd>{{ d.ownerName }}</dd></div>
+        <div><dt>Partner ID</dt><dd class="fk-num">{{ d.ownerRef }}</dd></div>
+        <div><dt>Amount</dt><dd class="fk-num"><strong>{{ d.amount | money }}</strong></dd></div>
+        <div><dt>Requested</dt><dd>{{ d.requestedAt | date: 'medium' }}</dd></div>
+        @if (d.requesterNote) {
+          <div class="facts__wide"><dt>Partner note</dt><dd>{{ d.requesterNote }}</dd></div>
+        }
+      </dl>
+    </section>
+
+    <!-- Default bank account (admin view) -->
+    <section class="section">
+      <h3 class="section__title">Default bank account</h3>
+      @if (d.defaultBankAccount; as b) {
+        <dl class="facts">
+          <div><dt>Account holder</dt><dd>{{ b.accountHolder }}</dd></div>
+          <div><dt>Nickname</dt><dd>{{ b.nickname }}</dd></div>
+          <div><dt>Bank</dt><dd>{{ b.bankName }}</dd></div>
+          <div>
+            <dt>Account number</dt>
+            <dd class="copyable">
+              <span class="fk-num">{{ b.accountNumber || ('••••' + b.accountNumberLast4) }}</span>
+              @if (b.accountNumber) {
+                <button
+                  type="button"
+                  class="copy-btn"
+                  (click)="copy('Account number', b.accountNumber)"
+                  [attr.aria-label]="'Copy account number'"
+                  [title]="copiedField() === 'Account number' ? 'Copied!' : 'Copy to clipboard'"
+                >
+                  @if (copiedField() === 'Account number') {
+                    <svg class="copy-btn__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                      <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M4 12l5 5L20 6" />
+                    </svg>
+                    <span>Copied</span>
+                  } @else {
+                    <svg class="copy-btn__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                      <rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+                      <path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <span>Copy</span>
+                  }
+                </button>
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>IFSC</dt>
+            <dd class="copyable">
+              <span class="fk-num">{{ b.ifsc }}</span>
+              <button
+                type="button"
+                class="copy-btn"
+                (click)="copy('IFSC', b.ifsc)"
+                [attr.aria-label]="'Copy IFSC'"
+                [title]="copiedField() === 'IFSC' ? 'Copied!' : 'Copy to clipboard'"
+              >
+                @if (copiedField() === 'IFSC') {
+                  <svg class="copy-btn__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                    <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M4 12l5 5L20 6" />
+                  </svg>
+                  <span>Copied</span>
+                } @else {
+                  <svg class="copy-btn__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                    <rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+                    <path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                  <span>Copy</span>
+                }
+              </button>
+            </dd>
+          </div>
+        </dl>
+        <p class="muted small">Transfer the amount to this account from the company bank, then record the transaction below.</p>
+      } @else {
+        <app-alert tone="warning" title="No default bank account">
+          The partner has no default bank account configured. Use the snapshot below.
+        </app-alert>
+      }
+    </section>
+
+    @if (d.transactionId || d.adminComment || d.failureReason) {
+      <section class="section">
+        <h3 class="section__title">Action record</h3>
+        <dl class="facts">
+          @if (d.actionedAt) {
+            <div><dt>Actioned at</dt><dd>{{ d.actionedAt | date: 'medium' }}</dd></div>
+          }
+          @if (d.transactionId) {
+            <div><dt>Transaction ID</dt><dd class="fk-num">{{ d.transactionId }}</dd></div>
+          }
+          @if (d.failureReason) {
+            <div class="facts__wide"><dt>Failure reason</dt><dd>{{ d.failureReason }}</dd></div>
+          }
+          @if (d.adminComment) {
+            <div class="facts__wide"><dt>Admin comment</dt><dd>{{ d.adminComment }}</dd></div>
+          }
+        </dl>
+      </section>
+    }
+
+    <!-- Action forms (PENDING only) -->
+    @if (d.status === 'PENDING') {
+      @if (mode() === 'success') {
+        <section class="section">
+          <h3 class="section__title">Mark as success</h3>
+          <form [formGroup]="successForm" (ngSubmit)="submitSuccess()" novalidate class="form">
+            <label class="field">
+              <span class="field__label">Transaction ID / UTR *</span>
+              <input type="text" formControlName="transactionId" maxlength="64" />
+              @if (successForm.controls.transactionId.touched && successForm.controls.transactionId.invalid) {
+                <span class="field__err">Transaction ID is required.</span>
+              }
+            </label>
+            <label class="field">
+              <span class="field__label">Comment (optional)</span>
+              <textarea formControlName="adminComment" rows="2" maxlength="500"></textarea>
+            </label>
+            @if (error(); as msg) { <app-alert tone="error" title="Could not save">{{ msg }}</app-alert> }
+          </form>
+        </section>
+      } @else if (mode() === 'failed') {
+        <section class="section">
+          <h3 class="section__title">Mark as failed</h3>
+          <p class="muted small">The amount will be released from hold and returned to the partner's available balance.</p>
+          <form [formGroup]="failForm" (ngSubmit)="submitFail()" novalidate class="form">
+            <label class="field">
+              <span class="field__label">Reason *</span>
+              <input type="text" formControlName="reason" maxlength="300" placeholder="e.g. Invalid IFSC, transfer rejected by bank" />
+              @if (failForm.controls.reason.touched && failForm.controls.reason.invalid) {
+                <span class="field__err">A reason is required.</span>
+              }
+            </label>
+            <label class="field">
+              <span class="field__label">Comment (optional)</span>
+              <textarea formControlName="adminComment" rows="2" maxlength="500"></textarea>
+            </label>
+            @if (error(); as msg) { <app-alert tone="error" title="Could not save">{{ msg }}</app-alert> }
+          </form>
+        </section>
+      }
+    }
+  } @else {
+    <p class="muted">Loading…</p>
+    @if (error(); as msg) { <app-alert tone="error" title="Could not load">{{ msg }}</app-alert> }
+  }
+
+  <div footer>
+    @if (detail()?.status === 'PENDING' && mode() === 'view') {
+      <app-button variant="secondary" (pressed)="close()">Close</app-button>
+      <app-button variant="danger" (pressed)="startFail()">Mark failed</app-button>
+      <app-button (pressed)="startSuccess()">Mark success</app-button>
+    } @else if (mode() === 'success') {
+      <app-button variant="secondary" (pressed)="backToView()">Back</app-button>
+      <app-button [loading]="submitting()" (pressed)="submitSuccess()">Save success</app-button>
+    } @else if (mode() === 'failed') {
+      <app-button variant="secondary" (pressed)="backToView()">Back</app-button>
+      <app-button variant="danger" [loading]="submitting()" (pressed)="submitFail()">Save failed</app-button>
+    } @else {
+      <app-button variant="secondary" (pressed)="close()">Close</app-button>
+    }
+  </div>
+</app-dialog-shell>

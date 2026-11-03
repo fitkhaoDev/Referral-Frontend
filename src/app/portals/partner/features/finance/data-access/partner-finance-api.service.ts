@@ -6,6 +6,7 @@ import { APP_CONFIG } from '@core/config/app-config.token';
 import {
   AddBankAccountPayload,
   AddUpiPayload,
+  CreateWithdrawalRequestPayload,
   EditBankAccountPayload,
   PartnerBankAccount,
   PartnerBankAccountList,
@@ -19,6 +20,8 @@ import {
   UpdatePartnerProfilePayload,
   WithdrawalDestinationType,
   WithdrawalQuote,
+  WithdrawalRequest,
+  WithdrawalRequestPage,
 } from '../models/finance.model';
 
 /** Single partner-portal HTTP service for the whole finance surface. */
@@ -115,6 +118,19 @@ export class PartnerFinanceApi {
   cancelWithdrawal(id: string): Observable<PartnerWithdrawal> {
     return this.http
       .post<any>(`${this.base}/withdrawals/${id}/cancel`, {})
+      .pipe(map((res) => res.data));
+  }
+
+  // ─ Manual-approval withdrawal requests (current active flow) ─────────────
+  createWithdrawalRequest(payload: CreateWithdrawalRequestPayload): Observable<WithdrawalRequest> {
+    return this.http
+      .post<any>(`${this.base}/withdrawal-requests`, payload)
+      .pipe(map((res) => res.data));
+  }
+  listWithdrawalRequests(page = 0, size = 10): Observable<WithdrawalRequestPage> {
+    const params = new HttpParams().set('page', String(page)).set('size', String(size));
+    return this.http
+      .get<any>(`${this.base}/withdrawal-requests`, { params })
       .pipe(map((res) => res.data));
   }
 }
