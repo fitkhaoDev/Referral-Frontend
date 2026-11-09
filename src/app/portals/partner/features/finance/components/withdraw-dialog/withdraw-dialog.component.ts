@@ -43,11 +43,14 @@ export class WithdrawDialogComponent {
     { initialValue: null },
   );
 
-  // Manual-approval flow: show all accounts, verification is advisory.
-  protected readonly verifiedBanks = computed<readonly PartnerBankAccount[]>(
-    () => this.banks()?.accounts ?? [],
-  );
-  protected readonly hasBanks = computed(() => this.verifiedBanks().length > 0);
+  // Manual-approval flow: always credits to the default bank account. We only
+  // surface the primary (default) one; partners switch the default from the
+  // Profile page if they want to withdraw to a different account.
+  protected readonly defaultBank = computed<PartnerBankAccount | null>(() => {
+    const accounts = this.banks()?.accounts ?? [];
+    return accounts.find((a) => a.isPrimary) ?? accounts[0] ?? null;
+  });
+  protected readonly hasBanks = computed(() => this.defaultBank() !== null);
 
   protected readonly form = this.fb.nonNullable.group({
     bankAccountId: ['', Validators.required],

@@ -4,8 +4,8 @@
   (dismissed)="cancel()"
 >
   @if (!hasBanks()) {
-    <app-alert tone="warning" title="No verified bank account">
-      Please add and verify a bank account from your Profile before requesting a withdrawal.
+    <app-alert tone="warning" title="No bank account">
+      Please add a bank account from your Profile before requesting a withdrawal.
     </app-alert>
   } @else if (wallet()?.suspended) {
     <app-alert tone="warning" title="Withdrawals disabled">
@@ -13,19 +13,23 @@
     </app-alert>
   } @else {
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
-      <label class="field">
-        <span class="field__label">Credit to</span>
-        <select formControlName="bankAccountId">
-          @for (b of verifiedBanks(); track b.id) {
-            <option [value]="b.id">
-              {{ b.nickname }} — {{ b.bankName }} ••••{{ b.accountNumberLast4 }}{{ b.isPrimary ? ' (Default)' : '' }}
-            </option>
-          }
-        </select>
-        <span class="field__hint">
-          Admin will transfer money to this bank account manually and mark the request complete.
-        </span>
-      </label>
+      @if (defaultBank(); as b) {
+        <div class="field">
+          <span class="field__label">Credit to (default account)</span>
+          <div class="default-bank" aria-readonly="true">
+            <div class="default-bank__title">
+              {{ b.nickname }}
+              <span class="default-bank__badge">Default</span>
+            </div>
+            <div class="default-bank__meta">
+              {{ b.bankName }} · ••••{{ b.accountNumberLast4 }} · {{ b.ifsc }}
+            </div>
+          </div>
+          <span class="field__hint">
+            Withdrawals always credit your default bank account. Change the default from your Profile page.
+          </span>
+        </div>
+      }
 
       <label class="field">
         <span class="field__label">Amount (₹)</span>

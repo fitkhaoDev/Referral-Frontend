@@ -55,6 +55,33 @@ input[type='number'] {
   color: var(--fk-danger);
   margin-top: 2px;
 }
+.default-bank {
+  padding: var(--fk-space-3);
+  border: 1px solid var(--fk-border);
+  border-radius: var(--fk-radius-md);
+  background: var(--fk-surface-muted, #f6f8f6);
+  color: var(--fk-faint);
+  cursor: not-allowed;
+}
+.default-bank__title {
+  display: flex;
+  align-items: center;
+  gap: var(--fk-space-2);
+  color: var(--fk-dark, #1a1a2e);
+  font-weight: var(--fk-weight-medium);
+}
+.default-bank__badge {
+  font-size: var(--fk-text-xs);
+  padding: 2px 8px;
+  border-radius: var(--fk-radius-pill, 999px);
+  background: var(--fk-green-tint, #eafaf0);
+  color: var(--fk-green-strong, #0a8e5a);
+  font-weight: var(--fk-weight-medium);
+}
+.default-bank__meta {
+  margin-top: 4px;
+  font-size: var(--fk-text-sm);
+}
 .toggle {
   display: inline-flex;
   gap: var(--fk-space-2);
